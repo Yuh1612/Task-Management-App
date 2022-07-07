@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{77C468DE-6E0D-405E-B8C6-7094A644C59C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{B787B31E-D248-4EFB-BFA2-55805D935EA1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{EFD76399-B7CF-40DB-B0B8-C93E0EFA4077}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77C468DE-6E0D-405E-B8C6-7094A644C59C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C468DE-6E0D-405E-B8C6-7094A644C59C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C468DE-6E0D-405E-B8C6-7094A644C59C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C468DE-6E0D-405E-B8C6-7094A644C59C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B787B31E-D248-4EFB-BFA2-55805D935EA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B787B31E-D248-4EFB-BFA2-55805D935EA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B787B31E-D248-4EFB-BFA2-55805D935EA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B787B31E-D248-4EFB-BFA2-55805D935EA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFD76399-B7CF-40DB-B0B8-C93E0EFA4077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFD76399-B7CF-40DB-B0B8-C93E0EFA4077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFD76399-B7CF-40DB-B0B8-C93E0EFA4077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFD76399-B7CF-40DB-B0B8-C93E0EFA4077}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BA47156-CFA4-4F5B-8271-CFA5316EDFD8}
+	EndGlobalSection
+EndGlobal
