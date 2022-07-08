@@ -34,6 +34,8 @@ namespace Domain.Entities.Users
         [StringLength(200)]
         public string? RefreshToken { get; set; }
 
+        public DateTime? RefreshTokenExpiredDay { get; set; }
+
         public virtual ICollection<ProjectMember> ProjectMembers { get; set; }
         public virtual ICollection<TaskMember> TaskMembers { get; set; }
     }

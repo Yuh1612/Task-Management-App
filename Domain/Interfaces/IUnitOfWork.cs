@@ -15,6 +15,8 @@ namespace Domain.Interfaces
 
         IListTaskRepository listTaskRepository { get; }
 
+        IProjectMemberRepository projectMemberRepository { get; }
+
         Task SaveChangeAsync();
 
         Task BeginTransaction();

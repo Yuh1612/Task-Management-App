@@ -15,17 +15,19 @@ namespace Domain.Entities.Projects
             ListTasks = new HashSet<ListTask>();
             CreateDate = DateTime.UtcNow;
             CreatedById = user.Id;
+            UpdateDate = DateTime.UtcNow;
+            UpdatedById = user.Id;
 
             var addEvent = new CreateProjectDomainEvent(user, this);
             AddEvent(addEvent);
         }
 
-        public void Update(string name, string? description = null)
+        public void Update(User user, string? name, string? description = null)
         {
-            Name = name;
-            Description = description;
+            Name = name ?? Name;
+            Description = description ?? Description;
             UpdateDate = DateTime.UtcNow;
-            UpdatedById = Id;
+            UpdatedById = user.Id;
         }
 
         public bool IsThisUserCreated(User user)

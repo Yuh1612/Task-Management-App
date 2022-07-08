@@ -15,10 +15,12 @@ namespace Domain.Entities.ListTasks
             CreatedById = user.Id;
         }
 
-        public void Update(string? name, string? color)
+        public void Update(User user, string? name, string? color)
         {
             Name = name ?? Name;
             Color = color ?? Color;
+            UpdateDate = DateTime.UtcNow;
+            UpdatedById = user.Id;
         }
     }
 }

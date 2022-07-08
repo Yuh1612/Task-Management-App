@@ -56,6 +56,7 @@ builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IListTaskRepository, ListTaskRepository>();
+builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -65,6 +66,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IProjectDomainService, ProjectDomainService>();
 
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ProjectService>();
 
 var app = builder.Build();
 

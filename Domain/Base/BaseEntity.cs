@@ -16,6 +16,11 @@ namespace Domain.Base
         public int UpdatedById { get; set; }
     }
 
+    public interface IDeleteEntity
+    {
+        public bool IsDelete { get; set; }
+    }
+
     public abstract class AuditEntity : IAuditEntity
     {
         public virtual DateTime CreateDate { get; set; }
@@ -24,7 +29,12 @@ namespace Domain.Base
         public virtual int UpdatedById { get; set; }
     }
 
-    public abstract class BaseEntity : AuditEntity
+    public abstract class DeleteEntity : AuditEntity, IDeleteEntity
+    {
+        public virtual bool IsDelete { get; set; }
+    }
+
+    public abstract class BaseEntity : DeleteEntity
     {
         [NotMapped]
         private List<BaseDomainEvent> _events;

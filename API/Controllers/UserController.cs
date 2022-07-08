@@ -89,7 +89,7 @@ namespace API.Controllers
 
         [HttpGet("{Id}")]
         [Authorize]
-        public async Task<IActionResult> GetOne([FromRoute] GetOneRequest request,
+        public async Task<IActionResult> GetOne([FromRoute] GetOneUserRequest request,
             [FromServices] UserService userService)
         {
             try

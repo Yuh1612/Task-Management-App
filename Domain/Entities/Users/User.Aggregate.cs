@@ -10,42 +10,59 @@ namespace Domain.Entities.Users
         public User(string userName, string password, string name, string? email, int? age, DateTime? birthDay)
         {
             UserName = userName;
-            Password = password;
+            Password = BCrypt.Net.BCrypt.HashPassword(password);
             Name = name;
             Email = email;
             Age = age;
             BirthDay = birthDay;
             CreateDate = DateTime.UtcNow;
-            CreatedById = Id;
+            UpdateDate = DateTime.UtcNow;
 
             var addEvent = new CreateUserDomainEvent(this);
             AddEvent(addEvent);
         }
 
-        public void Update(int? userId, string? password, string? name, string? email, int? age, DateTime? birthDay)
+        public void Update(string? password, string? name, string? email, int? age, DateTime? birthDay)
         {
-            Password = password ?? Password;
+            Password = password == null ? Password : BCrypt.Net.BCrypt.HashPassword(password);
             Name = name ?? Name;
             Email = email ?? Email;
             Age = age ?? Age;
             BirthDay = birthDay ?? BirthDay;
             UpdateDate = DateTime.UtcNow;
-            UpdatedById = userId ?? Id;
         }
 
         public bool CheckPassword(string password)
         {
-            return BCrypt.Net.BCrypt.Verify(password, Password); ;
+            return BCrypt.Net.BCrypt.Verify(password, Password);
         }
 
         public void UpdateRefreshToken(string refreshToken)
         {
             RefreshToken = refreshToken;
+            RefreshTokenExpiredDay = DateTime.UtcNow.AddDays(2);
+            UpdateDate = DateTime.UtcNow;
         }
 
         public bool CheckRefreshToken(string refreshToken)
         {
             return RefreshToken.Equals(refreshToken);
+        }
+
+        public bool CheckRefreshTokenExpired()
+        {
+            return RefreshTokenExpiredDay <= DateTime.UtcNow;
+        }
+
+        public void Delete()
+        {
+            IsDelete = true;
+            UpdateDate = DateTime.UtcNow;
+        }
+
+        public bool IsMember(Project project)
+        {
+            return ProjectMembers.Where(m => m.ProjectId == project.Id).Any();
         }
     }
 }

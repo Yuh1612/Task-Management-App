@@ -11,13 +11,11 @@ namespace API.Services
 {
     public class UserService : BaseService
     {
-        public readonly ISender _mediator;
         public readonly IJwtHandler _jwtHandler;
         public readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, ISender mediator, IJwtHandler jwtHandler, IMapper mapper) : base(unitOfWork)
+        public UserService(IUnitOfWork unitOfWork, IJwtHandler jwtHandler, IMapper mapper) : base(unitOfWork)
         {
-            _mediator = mediator;
             _jwtHandler = jwtHandler;
             _mapper = mapper;
         }
@@ -28,7 +26,7 @@ namespace API.Services
             {
                 await UnitOfWork.BeginTransaction();
                 var user = new User(request.UserName,
-                    BCrypt.Net.BCrypt.HashPassword(request.Password),
+                    request.Password,
                     request.Name,
                     request.Email,
                     request.Age,
@@ -80,6 +78,7 @@ namespace API.Services
                 var user = await UnitOfWork.userRepository.FindAsync(userId);
                 if (user == null) throw new Exception("Invalid Token");
                 if (user.CheckRefreshToken(request.RefreshToken) == false) throw new Exception("Invalid Token");
+                if (user.CheckRefreshTokenExpired() == true) throw new Exception("Invalid Token");
                 var refreshTokenResponse = new RefreshTokenResponse
                 {
                     AccessToken = _jwtHandler.GenerateAccessToken(user),
@@ -106,8 +105,7 @@ namespace API.Services
                 await UnitOfWork.BeginTransaction();
                 var user = await UnitOfWork.userRepository.FindAsync(userId);
                 if (user == null) throw new UserNotFoundException("User Not Found");
-                var password = request.Password == null ? request.Password : BCrypt.Net.BCrypt.HashPassword(request.Password);
-                user.Update(userId, password, request.Name, request.Email, request.Age, request.BirthDay);
+                user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
                 UnitOfWork.userRepository.Update(user);
                 await UnitOfWork.CommitTransaction();
                 var updateUserResponse = _mapper.Map<UpdateUserResponse>(user);
@@ -120,12 +118,12 @@ namespace API.Services
             }
         }
 
-        public async Task<GetOneResponse> GetOne(GetOneRequest request)
+        public async Task<GetOneUserResponse> GetOne(GetOneUserRequest request)
         {
             var user = await UnitOfWork.userRepository.FindAsync(request.Id);
             if (user == null) throw new UserNotFoundException("User Not Found");
             var projects = await UnitOfWork.projectRepository.GetAllByUser(user);
-            var response = _mapper.Map<GetOneResponse>(user);
+            var response = _mapper.Map<GetOneUserResponse>(user);
             response.Projects = _mapper.Map<List<ProjectDTO>>(projects);
             return response;
         }

@@ -12,8 +12,11 @@ namespace API
         {
             CreateMap<User, AddUserResponse>();
             CreateMap<User, UpdateUserResponse>();
-            CreateMap<User, GetOneResponse>();
+            CreateMap<User, GetOneUserResponse>();
+            CreateMap<User, UserDTO>();
             CreateMap<Project, ProjectDTO>();
+            CreateMap<Project, GetOneProjectResponse>();
+            CreateMap<Project, UpdateProjectResponse>();
         }
     }
 }

@@ -12,21 +12,21 @@ namespace Domain.DomainServices
             {
                 throw new Exception("This member already exist.");
             }
-            project.ProjectMembers.Add(new ProjectMember { User = user, Project = project, IsCreated = isCreated });
+            project.ProjectMembers.Add(new ProjectMember
+            {
+                User = user,
+                Project = project,
+                IsCreated = isCreated,
+                CreateDate = DateTime.Now,
+                CreatedById = user.Id,
+                UpdateDate = DateTime.Now,
+                UpdatedById = user.Id,
+            });
         }
 
         public bool IsMemberExistInProject(User user, Project project)
         {
             return project.ProjectMembers.Any(x => x.UserId == user.Id);
-        }
-
-        public bool IsProjectExist(User user, string name)
-        {
-            foreach (ProjectMember projectMember in user.ProjectMembers)
-            {
-                if (projectMember.Project.Name == name) return true;
-            }
-            return false;
         }
     }
 }

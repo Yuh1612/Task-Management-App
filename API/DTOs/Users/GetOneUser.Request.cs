@@ -2,7 +2,7 @@
 
 namespace API.DTOs.Users
 {
-    public class GetOneRequest
+    public class GetOneUserRequest
     {
         [Required]
         public int Id { get; set; }
