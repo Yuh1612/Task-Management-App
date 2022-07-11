@@ -21,19 +21,31 @@ namespace Infrastructure.Data
 
         private IProjectMemberRepository _projectMemberRepository;
 
+        private ITaskRepository _taskRepository;
+
+        private ITodoRepository _todoRepository;
+
+        private IAttachmentRepository _attachmentRepository;
+
         private readonly ApplicationDbContext _dbContext;
 
         public UnitOfWork(ApplicationDbContext dbContext,
             IUserRepository userRepository,
             IProjectRepository projectRepository,
             IListTaskRepository listTaskRepository,
-            IProjectMemberRepository projectMemberRepository)
+            IProjectMemberRepository projectMemberRepository,
+            ITaskRepository taskRepository,
+            ITodoRepository todoRepository,
+            IAttachmentRepository attachmentRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
             _projectRepository = projectRepository;
             _listTaskRepository = listTaskRepository;
             _projectMemberRepository = projectMemberRepository;
+            _taskRepository = taskRepository;
+            _todoRepository = todoRepository;
+            _attachmentRepository = attachmentRepository;
         }
 
         public IUserRepository userRepository => _userRepository;
@@ -43,6 +55,12 @@ namespace Infrastructure.Data
         public IListTaskRepository listTaskRepository => _listTaskRepository;
 
         public IProjectMemberRepository projectMemberRepository => _projectMemberRepository;
+
+        public ITaskRepository taskRepository => _taskRepository;
+
+        public ITodoRepository todoRepository => _todoRepository;
+
+        public IAttachmentRepository attachmentRepository => _attachmentRepository;
 
         public async Task BeginTransaction()
         {

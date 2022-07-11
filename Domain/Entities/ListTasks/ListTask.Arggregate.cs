@@ -13,6 +13,8 @@ namespace Domain.Entities.ListTasks
             Project = project;
             CreateDate = DateTime.UtcNow;
             CreatedById = user.Id;
+            UpdateDate = DateTime.UtcNow;
+            UpdatedById = user.Id;
         }
 
         public void Update(User user, string? name, string? color)
@@ -21,6 +23,11 @@ namespace Domain.Entities.ListTasks
             Color = color ?? Color;
             UpdateDate = DateTime.UtcNow;
             UpdatedById = user.Id;
+        }
+
+        public bool HasOwner(User user)
+        {
+            return Project.HasOwner(user);
         }
     }
 }

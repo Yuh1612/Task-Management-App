@@ -1,4 +1,6 @@
-﻿namespace Domain.Interfaces.Repositories
+﻿using System.Linq.Expressions;
+
+namespace Domain.Interfaces.Repositories
 {
     public interface IGenericRepository<T> where T : class
     {
@@ -8,7 +10,7 @@
 
         Task InsertRangeAsync(IEnumerable<T> entities);
 
-        Task<T?> FindAsync(params object[] keyValues);
+        Task<T> FindAsync(params object[] keyValues);
 
         void Update(T entity);
 

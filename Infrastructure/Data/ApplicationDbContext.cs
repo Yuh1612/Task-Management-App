@@ -40,11 +40,20 @@ namespace Infrastructure.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=VT-PGH;Database=TaskManagementDB;Trusted_Connection=True;");
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(@"Server=VT-PGH;Database=TaskManagementDB;Trusted_Connection=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<Project>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<ListTask>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<Domain.Entities.Tasks.Task>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<ProjectMember>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<TaskMember>().HasQueryFilter(p => !p.IsDelete);
+            modelBuilder.Entity<Label>().HasQueryFilter(p => !p.IsDelete);
         }
 
         public async System.Threading.Tasks.Task SaveEntitiesAsync()

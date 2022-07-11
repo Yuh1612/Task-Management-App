@@ -15,7 +15,20 @@ namespace Infrastructure.Data.Repositories
         {
             var projects = await dbSet.Include(x => x.ProjectMembers).ToListAsync();
 
-            return projects.Where(x => x.IsThisUserCreated(user) == true).ToList();
+            return projects.Where(x => x.HasOwner(user) == true).ToList();
+        }
+
+        public async Task<Project?> GetOneByListTask(int listTaskId)
+        {
+            var projects = await dbSet.Include(x => x.ListTasks).ToListAsync();
+            foreach (var project in projects)
+            {
+                foreach (var listtask in project.ListTasks)
+                {
+                    if (listtask.Id == listTaskId) return project;
+                }
+            }
+            return null;
         }
     }
 }

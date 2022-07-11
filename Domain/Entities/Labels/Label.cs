@@ -7,7 +7,7 @@ namespace Domain.Entities.Labels
     {
         public Label()
         {
-            this.Tasks = new HashSet<Tasks.Task>();
+            Tasks = new HashSet<Tasks.Task>();
         }
 
         [Required]
@@ -17,6 +17,6 @@ namespace Domain.Entities.Labels
         [StringLength(200)]
         public string Color { get; set; }
 
-        public ICollection<Tasks.Task> Tasks { get; set; }
+        public virtual ICollection<Tasks.Task> Tasks { get; set; }
     }
 }

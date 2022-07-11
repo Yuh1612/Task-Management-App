@@ -30,12 +30,37 @@ namespace Domain.Entities.Projects
             UpdatedById = user.Id;
         }
 
-        public bool IsThisUserCreated(User user)
+        public bool HasOwner(User user)
         {
-            return ProjectMembers.Where(p => p.UserId == user.Id && p.IsCreated == true).Any();
+            return ProjectMembers.Any(p => p.UserId == user.Id && p.IsCreated == true);
         }
 
-        public bool IsListTaskExist(string name)
+        public bool HasName(string? name)
+        {
+            if (name == null) return false;
+            return Name == name;
+        }
+
+        public void AddMember(User user, bool isCreated = false)
+        {
+            var projectMember = new ProjectMember(this, user, isCreated);
+            ProjectMembers.Add(projectMember);
+            user.AddProject(projectMember);
+        }
+
+        public void RemoveMember(User user)
+        {
+            if (HasOwner(user) == true) throw new ArgumentException(nameof(user));
+            var projectMember = ProjectMembers.FirstOrDefault(p => p.UserId == user.Id);
+            ProjectMembers.Remove(projectMember);
+        }
+
+        public bool HasMember(User user)
+        {
+            return ProjectMembers.Any(p => p.UserId == user.Id);
+        }
+
+        public bool HasListTask(string name)
         {
             return ListTasks.Any(l => l.Name == name);
         }

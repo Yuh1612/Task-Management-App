@@ -1,11 +1,6 @@
 ﻿using Domain.Base;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Entities.Tasks
 {
@@ -27,8 +22,8 @@ namespace Domain.Entities.Tasks
         public int? ParentId { get; set; }
 
         [Required]
-        public Tasks.Task Task { get; set; }
+        public virtual Task Task { get; set; }
 
-        public ICollection<Todo> SubTodos { get; set; }
+        public virtual ICollection<Todo> SubTodos { get; set; }
     }
 }

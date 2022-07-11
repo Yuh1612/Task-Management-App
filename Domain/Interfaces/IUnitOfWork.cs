@@ -17,6 +17,12 @@ namespace Domain.Interfaces
 
         IProjectMemberRepository projectMemberRepository { get; }
 
+        ITaskRepository taskRepository { get; }
+
+        ITodoRepository todoRepository { get; }
+
+        IAttachmentRepository attachmentRepository { get; }
+
         Task SaveChangeAsync();
 
         Task BeginTransaction();

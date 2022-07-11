@@ -1,5 +1,4 @@
-﻿using API.Exceptions;
-using Domain.Entities.Users;
+﻿using Domain.Entities.Users;
 using Domain.Interfaces;
 
 namespace API.Services
@@ -15,9 +14,9 @@ namespace API.Services
 
         public async Task<User> CheckUser(int? userId)
         {
-            if (userId == null) throw new Exception("Something went wrong");
+            if (userId == null) throw new KeyNotFoundException(nameof(userId));
             var user = await UnitOfWork.userRepository.FindAsync(userId);
-            if (user == null) throw new UserNotFoundException("User not found");
+            if (user == null) throw new KeyNotFoundException(nameof(user));
             return user;
         }
     }

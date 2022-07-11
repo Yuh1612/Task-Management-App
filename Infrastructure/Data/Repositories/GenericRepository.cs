@@ -1,5 +1,6 @@
 ﻿using Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Data.Repositories
 {
@@ -30,7 +31,7 @@ namespace Infrastructure.Data.Repositories
             dbSet.RemoveRange(entities);
         }
 
-        public async Task<T?> FindAsync(params object[] keyValues)
+        public async Task<T> FindAsync(params object[] keyValues)
         {
             var result = await dbSet.FindAsync(keyValues);
             if (result == null) throw new KeyNotFoundException();

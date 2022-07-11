@@ -1,11 +1,9 @@
 ﻿using API.DTOs.Projects;
 using API.DTOs.Users;
-using API.Exceptions;
 using AutoMapper;
 using Domain.Entities.Users;
 using Domain.Interfaces;
 using Domain.Interfaces.Authentications;
-using MediatR;
 
 namespace API.Services
 {
@@ -49,9 +47,10 @@ namespace API.Services
         {
             try
             {
-                var user = await UnitOfWork.userRepository.FindOneByUserName(request.UserName);
-                if (user == null) throw new UserNotFoundException("User not found");
-                if (user.CheckPassword(request.Password) == false) throw new InvalidUserPasswordException("Wrong password");
+                var user = await UnitOfWork.userRepository.GetOneByUserName(request.UserName);
+                if (user == null) throw new KeyNotFoundException(nameof(user));
+
+                if (user.HasPassword(request.Password) == false) throw new InvalidOperationException(nameof(request.Password));
                 var loginresponse = new LoginResponse
                 {
                     AccessToken = _jwtHandler.GenerateAccessToken(user),
@@ -76,9 +75,9 @@ namespace API.Services
             {
                 int userId = _jwtHandler.ValidateAccessToken(request.AccessToken);
                 var user = await UnitOfWork.userRepository.FindAsync(userId);
-                if (user == null) throw new Exception("Invalid Token");
-                if (user.CheckRefreshToken(request.RefreshToken) == false) throw new Exception("Invalid Token");
-                if (user.CheckRefreshTokenExpired() == true) throw new Exception("Invalid Token");
+                if (user == null) throw new KeyNotFoundException(nameof(user));
+                if (user.HasRefreshToken(request.RefreshToken) == false) throw new ArgumentException(nameof(request.RefreshToken));
+                if (user.IsRefreshTokenExpired() == true) throw new ArgumentException(nameof(request.RefreshToken));
                 var refreshTokenResponse = new RefreshTokenResponse
                 {
                     AccessToken = _jwtHandler.GenerateAccessToken(user),
@@ -101,10 +100,13 @@ namespace API.Services
         {
             try
             {
-                if (userId == null) throw new Exception("Invalid user");
+                if (userId == null) throw new KeyNotFoundException(nameof(userId));
+
                 await UnitOfWork.BeginTransaction();
                 var user = await UnitOfWork.userRepository.FindAsync(userId);
-                if (user == null) throw new UserNotFoundException("User Not Found");
+
+                if (user == null) throw new DirectoryNotFoundException(nameof(user));
+
                 user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
                 UnitOfWork.userRepository.Update(user);
                 await UnitOfWork.CommitTransaction();
@@ -121,7 +123,7 @@ namespace API.Services
         public async Task<GetOneUserResponse> GetOne(GetOneUserRequest request)
         {
             var user = await UnitOfWork.userRepository.FindAsync(request.Id);
-            if (user == null) throw new UserNotFoundException("User Not Found");
+            if (user == null) throw new KeyNotFoundException(nameof(user));
             var projects = await UnitOfWork.projectRepository.GetAllByUser(user);
             var response = _mapper.Map<GetOneUserResponse>(user);
             response.Projects = _mapper.Map<List<ProjectDTO>>(projects);

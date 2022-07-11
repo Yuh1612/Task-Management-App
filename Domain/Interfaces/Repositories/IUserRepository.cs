@@ -5,8 +5,10 @@ namespace Domain.Interfaces.Repositories
 {
     public interface IUserRepository : IGenericRepository<User>
     {
-        public Task<User?> FindOneByUserName(string userName);
+        public Task<User?> GetOneByUserName(string userName);
 
         public Task<List<User>> GetAllByProject(Project project);
+
+        public Task<List<User>> GetAllByTask(Entities.Tasks.Task task);
     }
 }

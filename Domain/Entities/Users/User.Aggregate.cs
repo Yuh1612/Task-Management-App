@@ -1,5 +1,6 @@
 ﻿using Domain.Base;
 using Domain.Entities.Projects;
+using Domain.Entities.Tasks;
 using Domain.Entities.Users.Events;
 using MediatR;
 
@@ -15,6 +16,7 @@ namespace Domain.Entities.Users
             Email = email;
             Age = age;
             BirthDay = birthDay;
+            ProjectMembers = new HashSet<ProjectMember>();
             CreateDate = DateTime.UtcNow;
             UpdateDate = DateTime.UtcNow;
 
@@ -32,7 +34,12 @@ namespace Domain.Entities.Users
             UpdateDate = DateTime.UtcNow;
         }
 
-        public bool CheckPassword(string password)
+        public bool HasUserName(string username)
+        {
+            return UserName.Equals(username);
+        }
+
+        public bool HasPassword(string password)
         {
             return BCrypt.Net.BCrypt.Verify(password, Password);
         }
@@ -44,12 +51,12 @@ namespace Domain.Entities.Users
             UpdateDate = DateTime.UtcNow;
         }
 
-        public bool CheckRefreshToken(string refreshToken)
+        public bool HasRefreshToken(string refreshToken)
         {
             return RefreshToken.Equals(refreshToken);
         }
 
-        public bool CheckRefreshTokenExpired()
+        public bool IsRefreshTokenExpired()
         {
             return RefreshTokenExpiredDay <= DateTime.UtcNow;
         }
@@ -60,9 +67,29 @@ namespace Domain.Entities.Users
             UpdateDate = DateTime.UtcNow;
         }
 
-        public bool IsMember(Project project)
+        public bool HasProject(Project project)
         {
-            return ProjectMembers.Where(m => m.ProjectId == project.Id).Any();
+            return ProjectMembers.Any(m => m.ProjectId == project.Id);
+        }
+
+        public bool HasTask(Tasks.Task task)
+        {
+            return TaskMembers.Any(m => m.TaskId == task.Id);
+        }
+
+        public bool HasProject(string? name)
+        {
+            return ProjectMembers.Any(m => m.Project.HasName(name));
+        }
+
+        internal void AddProject(ProjectMember projectMember)
+        {
+            ProjectMembers.Add(projectMember);
+        }
+
+        internal void AddTask(TaskMember taskMember)
+        {
+            TaskMembers.Add(taskMember);
         }
     }
 }

@@ -10,6 +10,17 @@ namespace Domain.Entities.Tasks
 {
     public class Attachment : BaseEntity<int>
     {
+        public Attachment()
+        {
+        }
+
+        public Attachment(string fileName, string type, string storageUrl)
+        {
+            FileName = fileName;
+            Type = type;
+            StorageUrl = storageUrl;
+        }
+
         [Required]
         [StringLength(200)]
         public string FileName { get; set; }
@@ -22,6 +33,6 @@ namespace Domain.Entities.Tasks
         public string StorageUrl { get; set; }
 
         [Required]
-        public Tasks.Task Task { get; set; }
+        public virtual Task Task { get; set; }
     }
 }

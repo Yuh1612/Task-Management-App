@@ -5,6 +5,18 @@ namespace Domain.Entities.Projects
 {
     public class ProjectMember : BaseEntity<int>
     {
+        public ProjectMember()
+        {
+
+        }
+
+        public ProjectMember(Project project, User user, bool isCreated)
+        {
+            Project = project;
+            User = user;
+            IsCreated = isCreated;
+        }
+
         public int? ProjectId { get; set; }
 
         public virtual Project Project { get; set; }

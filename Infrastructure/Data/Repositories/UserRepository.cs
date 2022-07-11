@@ -11,17 +11,21 @@ namespace Infrastructure.Data.Repositories
         {
         }
 
-        public async Task<User?> FindOneByUserName(string userName)
+        public async Task<User?> GetOneByUserName(string userName)
         {
-            var user = await dbSet.Where(u => u.UserName == userName).FirstOrDefaultAsync();
-            return user;
+            return await dbSet.FirstOrDefaultAsync(u => u.UserName == userName);
         }
 
         public async Task<List<User>> GetAllByProject(Project project)
         {
-            var users = await dbSet.Include(x => x.ProjectMembers).ToListAsync();
+            var users = await dbSet.ToListAsync();
+            return users.Where(x => x.HasProject(project) == true).ToList();
+        }
 
-            return users.Where(x => x.IsMember(project) == true).ToList();
+        public async Task<List<User>> GetAllByTask(Domain.Entities.Tasks.Task task)
+        {
+            var users = await dbSet.ToListAsync();
+            return users.Where(x => x.HasTask(task) == true).ToList();
         }
     }
 }

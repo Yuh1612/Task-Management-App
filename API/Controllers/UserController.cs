@@ -1,5 +1,4 @@
 ﻿using API.DTOs.Users;
-using API.Exceptions;
 using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +17,8 @@ namespace API.Controllers
         public async Task<IActionResult> Register([FromBody] AddUserRequest request,
             [FromServices] UserService userService)
         {
-            try
-            {
-                var response = await userService.AddUserAsync(request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e);
-            }
+            var response = await userService.AddUserAsync(request);
+            return Ok(response);
         }
 
         [HttpPost("login")]
@@ -38,17 +30,13 @@ namespace API.Controllers
                 var response = await userService.ValidateUser(request);
                 return Ok(response);
             }
-            catch (UserNotFoundException e)
+            catch (KeyNotFoundException e)
             {
                 return NotFound(e.Message);
             }
-            catch (InvalidUserPasswordException e)
-            {
-                return BadRequest(e.Message);
-            }
             catch (Exception e)
             {
-                return Ok(e.Message);
+                return BadRequest(e.Message);
             }
         }
 
@@ -61,6 +49,10 @@ namespace API.Controllers
                 var response = await userService.RefreshToken(request);
                 return Ok(response);
             }
+            catch (KeyNotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
             catch (Exception e)
             {
                 return BadRequest(e.Message);
@@ -72,19 +64,8 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request,
             [FromServices] UserService userService)
         {
-            try
-            {
-                var response = await userService.UpdateUser(request, GetCurrentUserId());
-                return Ok(response);
-            }
-            catch (UserNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            var response = await userService.UpdateUser(request, GetCurrentUserId());
+            return Ok(response);
         }
 
         [HttpGet("{Id}")]
@@ -92,19 +73,8 @@ namespace API.Controllers
         public async Task<IActionResult> GetOne([FromRoute] GetOneUserRequest request,
             [FromServices] UserService userService)
         {
-            try
-            {
-                var response = await userService.GetOne(request);
-                return Ok(response);
-            }
-            catch (UserNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            var response = await userService.GetOne(request);
+            return Ok(response);
         }
     }
 }

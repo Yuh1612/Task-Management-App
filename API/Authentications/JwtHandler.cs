@@ -106,8 +106,7 @@ namespace API.Authentications
         private DateTime ConvertUnixTimeToDateTime(long utcExpireDate)
         {
             var dateTimeInterval = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
-            return dateTimeInterval;
+            return dateTimeInterval.AddSeconds(utcExpireDate).ToUniversalTime();
         }
     }
 }

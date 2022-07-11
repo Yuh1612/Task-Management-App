@@ -1,13 +1,10 @@
 using API;
 using API.Authentications;
 using API.Services;
-using Domain.DomainServices;
-using Domain.Entities.Projects;
 using Domain.Entities.Projects.Events;
 using Domain.Entities.Users.Events;
 using Domain.Interfaces;
 using Domain.Interfaces.Authentications;
-using Domain.Interfaces.DomainServices;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Infrastructure.Data;
@@ -57,16 +54,19 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IListTaskRepository, ListTaskRepository>();
 builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IJwtHandler, JwtHandler>();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<IProjectDomainService, ProjectDomainService>();
-
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProjectService>();
+builder.Services.AddScoped<ListTaskService>();
+builder.Services.AddScoped<TaskService>();
 
 var app = builder.Build();
 

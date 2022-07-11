@@ -5,6 +5,17 @@ namespace Domain.Entities.Tasks
 {
     public class TaskMember : BaseEntity<int>
     {
+        public TaskMember()
+        {
+        }
+
+        public TaskMember(Task task, User user, bool isActive)
+        {
+            Task = task;
+            User = user;
+            IsActive = isActive;
+        }
+
         public int? TaskId { get; set; }
 
         public virtual Tasks.Task Task { get; set; }
