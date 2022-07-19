@@ -7,6 +7,6 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<List<Project>> GetAllByUser(User user);
 
-        public Task<Project?> GetOneByListTask(int listTaskId);
+        public Task<Project> GetOneByListTask(Guid listTaskId);
     }
 }

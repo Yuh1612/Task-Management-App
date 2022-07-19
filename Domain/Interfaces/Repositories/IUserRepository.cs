@@ -10,5 +10,7 @@ namespace Domain.Interfaces.Repositories
         public Task<List<User>> GetAllByProject(Project project);
 
         public Task<List<User>> GetAllByTask(Entities.Tasks.Task task);
+
+        public Task<bool> IsExistUserName(string userName);
     }
 }

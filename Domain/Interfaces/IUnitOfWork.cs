@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces.Repositories;
+﻿using Domain.Entities.Users;
+using Domain.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,15 @@ namespace Domain.Interfaces
 
         IAttachmentRepository attachmentRepository { get; }
 
+        ILabelRepository labelRepository { get; }
+
+        IHistoryRepository historyRepository { get; }
+
         Task SaveChangeAsync();
 
         Task BeginTransaction();
 
-        Task CommitTransaction();
+        Task CommitTransaction(bool IsAuthorize = true);
 
         Task RollbackTransaction();
     }

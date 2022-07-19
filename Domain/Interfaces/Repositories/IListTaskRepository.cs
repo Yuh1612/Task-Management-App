@@ -1,5 +1,4 @@
-﻿using Domain.Entities.ListTasks;
-using Domain.Entities.Projects;
+﻿using Domain.Entities.Projects;
 
 namespace Domain.Interfaces.Repositories
 {
@@ -7,6 +6,6 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<List<ListTask>> GetAllByProject(Project project);
 
-        public Task<ListTask?> GetOneByTask(int taskId);
+        public Task<ListTask> GetOneByTask(Guid taskId);
     }
 }

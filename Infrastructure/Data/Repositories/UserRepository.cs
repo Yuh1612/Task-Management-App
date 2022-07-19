@@ -13,7 +13,8 @@ namespace Infrastructure.Data.Repositories
 
         public async Task<User?> GetOneByUserName(string userName)
         {
-            return await dbSet.FirstOrDefaultAsync(u => u.UserName == userName);
+            var user = await dbSet.FirstOrDefaultAsync(u => u.UserName == userName);
+            return user;
         }
 
         public async Task<List<User>> GetAllByProject(Project project)
@@ -26,6 +27,11 @@ namespace Infrastructure.Data.Repositories
         {
             var users = await dbSet.ToListAsync();
             return users.Where(x => x.HasTask(task) == true).ToList();
+        }
+
+        public Task<bool> IsExistUserName(string userName)
+        {
+            return dbSet.AnyAsync(x => x.UserName == userName);
         }
     }
 }

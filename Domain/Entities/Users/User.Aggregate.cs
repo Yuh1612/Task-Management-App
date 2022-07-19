@@ -2,7 +2,6 @@
 using Domain.Entities.Projects;
 using Domain.Entities.Tasks;
 using Domain.Entities.Users.Events;
-using MediatR;
 
 namespace Domain.Entities.Users
 {
@@ -10,18 +9,17 @@ namespace Domain.Entities.Users
     {
         public User(string userName, string password, string name, string? email, int? age, DateTime? birthDay)
         {
+            if (Id == Guid.Empty) Id = Guid.NewGuid();
             UserName = userName;
-            Password = BCrypt.Net.BCrypt.HashPassword(password);
+            Password = password;
             Name = name;
             Email = email;
             Age = age;
             BirthDay = birthDay;
             ProjectMembers = new HashSet<ProjectMember>();
-            CreateDate = DateTime.UtcNow;
-            UpdateDate = DateTime.UtcNow;
 
-            var addEvent = new CreateUserDomainEvent(this);
-            AddEvent(addEvent);
+            var newEvent = new CreateUserDomainEvent(this);
+            AddEvent(newEvent);
         }
 
         public void Update(string? password, string? name, string? email, int? age, DateTime? birthDay)
@@ -31,7 +29,6 @@ namespace Domain.Entities.Users
             Email = email ?? Email;
             Age = age ?? Age;
             BirthDay = birthDay ?? BirthDay;
-            UpdateDate = DateTime.UtcNow;
         }
 
         public bool HasUserName(string username)
@@ -44,11 +41,15 @@ namespace Domain.Entities.Users
             return BCrypt.Net.BCrypt.Verify(password, Password);
         }
 
+        public void HashPassWord()
+        {
+            Password = BCrypt.Net.BCrypt.HashPassword(Password);
+        }
+
         public void UpdateRefreshToken(string refreshToken)
         {
             RefreshToken = refreshToken;
             RefreshTokenExpiredDay = DateTime.UtcNow.AddDays(2);
-            UpdateDate = DateTime.UtcNow;
         }
 
         public bool HasRefreshToken(string refreshToken)
@@ -64,7 +65,6 @@ namespace Domain.Entities.Users
         public void Delete()
         {
             IsDelete = true;
-            UpdateDate = DateTime.UtcNow;
         }
 
         public bool HasProject(Project project)
@@ -80,6 +80,11 @@ namespace Domain.Entities.Users
         public bool HasProject(string? name)
         {
             return ProjectMembers.Any(m => m.Project.HasName(name));
+        }
+
+        public bool HasProject(Guid id)
+        {
+            return ProjectMembers.Any(m => m.Project.Id == id);
         }
 
         internal void AddProject(ProjectMember projectMember)

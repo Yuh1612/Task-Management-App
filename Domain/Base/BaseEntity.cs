@@ -3,17 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Base
 {
-    public interface IBaseEntity<Tkey>
+    public interface IBaseEntity
     {
-        public Tkey Id { get; set; }
-    }
-
-    public interface IAuditEntity
-    {
-        public DateTime CreateDate { get; set; }
-        public int CreatedById { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public int UpdatedById { get; set; }
+        public Guid Id { get; set; }
     }
 
     public interface IDeleteEntity
@@ -21,20 +13,19 @@ namespace Domain.Base
         public bool IsDelete { get; set; }
     }
 
-    public abstract class AuditEntity : IAuditEntity
-    {
-        public virtual DateTime CreateDate { get; set; }
-        public virtual int CreatedById { get; set; }
-        public virtual DateTime UpdateDate { get; set; }
-        public virtual int UpdatedById { get; set; }
-    }
-
-    public abstract class DeleteEntity : AuditEntity, IDeleteEntity
+    public abstract class DeleteEntity : BaseEntity, IDeleteEntity
     {
         public virtual bool IsDelete { get; set; }
     }
 
-    public abstract class BaseEntity : DeleteEntity
+    public abstract class BaseEntity : IBaseEntity
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public virtual Guid Id { get; set; }
+    }
+
+    public abstract class Entity : DeleteEntity
     {
         [NotMapped]
         private List<BaseDomainEvent> _events;
@@ -57,12 +48,5 @@ namespace Domain.Base
         {
             _events?.Clear();
         }
-    }
-
-    public abstract class BaseEntity<TKey> : BaseEntity, IBaseEntity<TKey>
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public virtual TKey Id { get; set; }
     }
 }

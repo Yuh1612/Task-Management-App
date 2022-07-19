@@ -10,143 +10,99 @@ namespace API.Controllers
     [Authorize]
     public class TaskController : ApplicationController
     {
-        public TaskController(IHttpContextAccessor contextAccessor) : base(contextAccessor)
-        {
-        }
-
         [HttpGet("{Id}")]
-        public async Task<IActionResult> AddTask([FromRoute] GetOneTaskRequest request,
+        public async Task<IActionResult> GetOne([FromRoute] Guid Id,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.GetOne(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            return Ok(await taskService.GetOne(Id));
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTask([FromBody] AddTaskRequest request,
+        public async Task<IActionResult> AddTask([FromBody] CreateTaskDTO request,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.AddTask(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            var task = await taskService.AddTask(request);
+            return CreatedAtAction(nameof(GetOne), new { Id = task.Id }, task);
         }
 
         [HttpPatch]
-        public async Task<IActionResult> UpdateTask([FromBody] UpdateTaskRequest request,
+        public async Task<IActionResult> UpdateTask([FromBody] TaskDetailDTO request,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.UpdateTask(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.UpdateTask(request);
+            return NoContent();
+        }
+
+        [HttpDelete("{Id}")]
+        public async Task<IActionResult> DeleteTask([FromRoute] Guid Id,
+            [FromServices] TaskService taskService)
+        {
+            await taskService.DeleteTask(Id);
+            return NoContent();
         }
 
         [HttpPost("Todos")]
-        public async Task<IActionResult> AddTodo([FromBody] AddTodoRequest request,
+        public async Task<IActionResult> AddTodo([FromBody] CreateTodoDTO request,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.AddTodo(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.AddTodo(request);
+            return NoContent();
         }
 
         [HttpDelete("Todos/{Id}")]
-        public async Task<IActionResult> RemoveTodo([FromRoute] RemoveTodoRequest request,
+        public async Task<IActionResult> RemoveTodo([FromRoute] Guid Id,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.RemoveTodo(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.RemoveTodo(Id);
+            return NoContent();
         }
 
         [HttpPost("Attachments")]
-        public async Task<IActionResult> AddTodo([FromForm] AddAttachmentRequest request,
+        public async Task<IActionResult> AddAttachment([FromForm] CreateAttachmentDTO request,
            [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.AddAttachment(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.AddAttachment(request);
+            return NoContent();
         }
 
         [HttpDelete("Attachments/{Id}")]
-        public async Task<IActionResult> RemoveAttachment([FromRoute] RemoveAttachmentRequest request,
+        public async Task<IActionResult> RemoveAttachment([FromRoute] Guid Id,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.RemoveAttachment(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.RemoveAttachment(Id);
+            return NoContent();
         }
 
         [HttpPost("Members")]
-        public async Task<IActionResult> AddMember([FromBody] AddAssigneeRequest request,
+        public async Task<IActionResult> AddMember([FromBody] AssigmentDTO request,
            [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.AddMember(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.AddMember(request);
+            return NoContent();
         }
 
         [HttpDelete("Members")]
-        public async Task<IActionResult> RemoveMembert([FromBody] RemoveAssgineeRequest request,
+        public async Task<IActionResult> RemoveMember([FromBody] AssigmentDTO request,
             [FromServices] TaskService taskService)
         {
-            try
-            {
-                var response = await taskService.RemoveMember(GetCurrentUserId(), request);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+            await taskService.RemoveMember(request);
+            return NoContent();
+        }
+
+        [HttpPost("Labels")]
+        public async Task<IActionResult> AddLabel([FromBody] TaskLabelDTO request,
+           [FromServices] TaskService taskService)
+        {
+            await taskService.AddLabel(request);
+            return NoContent();
+        }
+
+        [HttpDelete("Labels")]
+        public async Task<IActionResult> RemoveLabel([FromBody] TaskLabelDTO request,
+            [FromServices] TaskService taskService)
+        {
+            await taskService.RemoveLabel(request);
+            return NoContent();
         }
     }
 }

@@ -6,7 +6,9 @@ namespace Domain.Interfaces.Authentications
     {
         public string GenerateAccessToken(User user);
 
-        public int ValidateAccessToken(string accessToken);
+        public Guid ValidateAccessToken(string accessToken);
+
+        public Guid GetUserId(string accessToken);
 
         public string GenerateRefreshToken();
     }

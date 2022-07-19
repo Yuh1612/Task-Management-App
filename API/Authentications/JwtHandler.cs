@@ -1,8 +1,10 @@
-﻿using Domain.Entities.Users;
+﻿using API.Extensions;
+using Domain.Entities.Users;
 using Domain.Interfaces.Authentications;
 using Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,11 +24,12 @@ namespace API.Authentications
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("UserId", user.Id.ToString()),
+                    new Claim(ClaimTypes.Hash, user.Id.ToString()),
                     new Claim("UserName", user.UserName),
                     new Claim(ClaimTypes.Name, user.Name),
                 }),
 
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddHours(1),
 
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyBytes),
@@ -50,7 +53,7 @@ namespace API.Authentications
             }
         }
 
-        public int ValidateAccessToken(string accessToken)
+        public Guid GetUserId(string accessToken)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
 
@@ -82,20 +85,66 @@ namespace API.Authentications
                         SecurityAlgorithms.HmacSha512,
                         StringComparison.InvariantCultureIgnoreCase
                     );
-                    if (!result) throw new Exception("Invalid Token");
+                    if (!result) throw new HttpResponseException(HttpStatusCode.Unauthorized);
                 }
 
-                var userId = tokenInVerification.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-                if (userId == null) throw new Exception("Invalid Token");
+                var userId = tokenInVerification.Claims.First(x => x.Type == "UserId").Value;
+                if (userId == null) throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
+                return Guid.Parse(userId);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public Guid ValidateAccessToken(string accessToken)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+            var secretKeyBytes = Encoding.UTF8.GetBytes(AppSettings.SecretKey);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.SecretKey)),
+
+                ClockSkew = TimeSpan.Zero,
+
+                ValidateLifetime = false,
+            };
+            try
+            {
+                var tokenInVerification = jwtTokenHandler.ValidateToken(
+                    accessToken,
+                    tokenValidationParameters,
+                    out var validatedToken
+                );
+
+                if (validatedToken is JwtSecurityToken jwtSecurityToken)
+                {
+                    var result = jwtSecurityToken.Header.Alg.Equals(
+                        SecurityAlgorithms.HmacSha512,
+                        StringComparison.InvariantCultureIgnoreCase
+                    );
+                    if (!result) throw new HttpResponseException(HttpStatusCode.Unauthorized);
+                }
+
+                var userId = tokenInVerification.Claims.First(x => x.Type == "UserId").Value;
+                if (userId == null) throw new HttpResponseException(HttpStatusCode.Unauthorized);
 
                 var utcExpireDate = long.Parse(tokenInVerification.Claims.
-                    FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+                    First(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
                 var expireDate = ConvertUnixTimeToDateTime(utcExpireDate);
 
-                if (expireDate > DateTime.UtcNow) throw new Exception("AccessToken still available");
+                if (expireDate > DateTime.UtcNow) throw new HttpResponseException(HttpStatusCode.Unauthorized);
 
-                return Int32.Parse(userId);
+                return Guid.Parse(userId);
             }
             catch
             {

@@ -10,7 +10,7 @@ namespace Domain.Interfaces.Repositories
 
         Task InsertRangeAsync(IEnumerable<T> entities);
 
-        Task<T> FindAsync(params object[] keyValues);
+        Task<T?> FindAsync(params object[] keyValues);
 
         void Update(T entity);
 

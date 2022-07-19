@@ -9,72 +9,45 @@ namespace API.Controllers
     [Route("api/[controller]s")]
     public class UserController : ApplicationController
     {
-        public UserController(IHttpContextAccessor contextAccessor) : base(contextAccessor)
+        [HttpGet("Infomations/{Id}")]
+        [Authorize]
+        public async Task<IActionResult> GetOne([FromRoute] Guid Id, [FromServices] UserService userService)
         {
+            return Ok(await userService.GetOne(Id));
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] AddUserRequest request,
-            [FromServices] UserService userService)
+        [HttpGet("{AccessToken}")]
+        [Authorize]
+        public async Task<IActionResult> GetInfo([FromRoute] string AccessToken, [FromServices] UserService userService)
         {
-            var response = await userService.AddUserAsync(request);
-            return Ok(response);
+            return Ok(await userService.GetInfo(AccessToken));
+        }
+
+        [HttpPost("regist")]
+        public async Task<IActionResult> Register([FromBody] CreateUserDTO request, [FromServices] UserService userService)
+        {
+            var user = await userService.CreateUser(request);
+            return CreatedAtAction(nameof(GetOne), new { Id = user.Id }, user);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request,
-            [FromServices] UserService userService)
+        public async Task<IActionResult> Login([FromBody] UserAccountDTO request, [FromServices] UserService userService)
         {
-            try
-            {
-                var response = await userService.ValidateUser(request);
-                return Ok(response);
-            }
-            catch (KeyNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(await userService.ValidateUser(request));
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request,
-            [FromServices] UserService userService)
+        public async Task<IActionResult> RefreshToken([FromBody] UserTokenDTO request, [FromServices] UserService userService)
         {
-            try
-            {
-                var response = await userService.RefreshToken(request);
-                return Ok(response);
-            }
-            catch (KeyNotFoundException e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
+            return Ok(await userService.RefreshToken(request));
         }
 
         [HttpPatch]
         [Authorize]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request,
-            [FromServices] UserService userService)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDTO request, [FromServices] UserService userService)
         {
-            var response = await userService.UpdateUser(request, GetCurrentUserId());
-            return Ok(response);
-        }
-
-        [HttpGet("{Id}")]
-        [Authorize]
-        public async Task<IActionResult> GetOne([FromRoute] GetOneUserRequest request,
-            [FromServices] UserService userService)
-        {
-            var response = await userService.GetOne(request);
-            return Ok(response);
+            await userService.UpdateUser(request);
+            return NoContent();
         }
     }
 }

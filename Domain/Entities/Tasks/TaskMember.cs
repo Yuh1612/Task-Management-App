@@ -3,7 +3,7 @@ using Domain.Entities.Users;
 
 namespace Domain.Entities.Tasks
 {
-    public class TaskMember : BaseEntity<int>
+    public class TaskMember : Entity
     {
         public TaskMember()
         {
@@ -16,11 +16,11 @@ namespace Domain.Entities.Tasks
             IsActive = isActive;
         }
 
-        public int? TaskId { get; set; }
+        public Guid? TaskId { get; set; }
 
         public virtual Tasks.Task Task { get; set; }
 
-        public int? UserId { get; set; }
+        public Guid? UserId { get; set; }
 
         public virtual User User { get; set; }
 

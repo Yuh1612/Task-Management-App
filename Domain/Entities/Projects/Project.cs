@@ -1,15 +1,14 @@
 ﻿using Domain.Base;
-using Domain.Entities.ListTasks;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.Projects
 {
-    public partial class Project : BaseEntity<int>
+    public partial class Project : Entity
     {
         public Project()
         {
-            this.ProjectMembers = new HashSet<ProjectMember>();
-            this.ListTasks = new HashSet<ListTask>();
+            ProjectMembers = new HashSet<ProjectMember>();
+            ListTasks = new HashSet<ListTask>();
         }
 
         [Required]
@@ -17,6 +16,7 @@ namespace Domain.Entities.Projects
         public string Name { get; set; }
 
         public string? Description { get; set; }
+
         public virtual ICollection<ProjectMember> ProjectMembers { get; set; }
 
         public virtual ICollection<ListTask> ListTasks { get; set; }

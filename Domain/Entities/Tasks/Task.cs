@@ -1,12 +1,10 @@
 ﻿using Domain.Base;
-using Domain.Entities.Labels;
-using Domain.Entities.ListTasks;
 using Domain.Entities.Projects;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.Tasks
 {
-    public partial class Task : BaseEntity<int>
+    public partial class Task : Entity
     {
         public Task()
         {

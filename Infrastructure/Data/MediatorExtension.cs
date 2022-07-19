@@ -8,7 +8,7 @@ namespace Infrastructure.Data
         public static async Task DispatchDomainEventsAsync(this IMediator mediator, ApplicationDbContext ctx)
         {
             var domainEntities = ctx.ChangeTracker
-                .Entries<BaseEntity>()
+                .Entries<Entity>()
                 .Where(x => x.Entity.Events != null && x.Entity.Events.Any());
 
             var domainEvents = domainEntities

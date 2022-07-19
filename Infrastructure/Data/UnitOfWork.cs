@@ -1,4 +1,5 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Entities.Users;
+using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,10 @@ namespace Infrastructure.Data
 
         private IAttachmentRepository _attachmentRepository;
 
+        private ILabelRepository _labelRepository;
+
+        private IHistoryRepository _historyRepository;
+
         private readonly ApplicationDbContext _dbContext;
 
         public UnitOfWork(ApplicationDbContext dbContext,
@@ -36,7 +41,9 @@ namespace Infrastructure.Data
             IProjectMemberRepository projectMemberRepository,
             ITaskRepository taskRepository,
             ITodoRepository todoRepository,
-            IAttachmentRepository attachmentRepository)
+            IAttachmentRepository attachmentRepository,
+            ILabelRepository labelRepository,
+            IHistoryRepository historyRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -46,6 +53,8 @@ namespace Infrastructure.Data
             _taskRepository = taskRepository;
             _todoRepository = todoRepository;
             _attachmentRepository = attachmentRepository;
+            _labelRepository = labelRepository;
+            _historyRepository = historyRepository;
         }
 
         public IUserRepository userRepository => _userRepository;
@@ -62,6 +71,10 @@ namespace Infrastructure.Data
 
         public IAttachmentRepository attachmentRepository => _attachmentRepository;
 
+        public ILabelRepository labelRepository => _labelRepository;
+
+        public IHistoryRepository historyRepository => _historyRepository;
+
         public async Task BeginTransaction()
         {
             if (_transaction == null)
@@ -77,9 +90,9 @@ namespace Infrastructure.Data
             }
         }
 
-        public async Task CommitTransaction()
+        public async Task CommitTransaction(bool IsAuthorize = true)
         {
-            await _dbContext.SaveEntitiesAsync();
+            await _dbContext.SaveEntitiesAsync(IsAuthorize);
 
             if (_transaction == null) return;
             await _transaction.CommitAsync();

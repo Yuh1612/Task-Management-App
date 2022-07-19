@@ -1,267 +1,198 @@
 ﻿using API.DTOs.Tasks;
-using API.DTOs.Users;
+using API.Extensions;
 using AutoMapper;
+using Domain.Entities.Tasks;
 using Domain.Interfaces;
+using Domain.Interfaces.DomainServices;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace API.Services
 {
     public class TaskService : BaseService
     {
-        private readonly IMapper _mapper;
-        private readonly ListTaskService _listTaskService;
+        private readonly ITaskManager _taskManager;
 
-        public TaskService(IUnitOfWork unitOfWork, IMapper mapper, ListTaskService listTaskService) : base(unitOfWork)
+        public TaskService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper,
+            IAuthorizationService authorizationService, ITaskManager taskManager)
+            : base(unitOfWork, contextAccessor, mapper, authorizationService)
         {
-            _mapper = mapper;
-            _listTaskService = listTaskService;
+            _taskManager = taskManager;
         }
 
-        public async Task<AddTaskResponse> AddTask(int? userId, AddTaskRequest request)
+        public async Task<TaskDTO> GetOne(Guid Id)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(Id);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var listTask = await UnitOfWork.listTaskRepository.FindAsync(request.listTaskId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (listTask.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(listTask));
-
-            var task = new Domain.Entities.Tasks.Task(user, listTask, request.Name, request.Description);
-
-            try
+            var todos = await _unitOfWork.todoRepository.GetAllByTask(task.Id);
+            var members = await _unitOfWork.userRepository.GetAllByTask(task);
+            var response = _mapper.Map<TaskDTO>(task);
+            _mapper.Map(todos, response.Todos);
+            foreach (var todo in response.Todos)
             {
-                await UnitOfWork.BeginTransaction();
-                await UnitOfWork.taskRepository.InsertAsync(task);
-                await UnitOfWork.CommitTransaction();
+                var subtodo = await _unitOfWork.todoRepository.GetAllSubTodosByTodo(todo.Id);
+                _mapper.Map(subtodo, todo.SubTodos);
             }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var response = _mapper.Map<AddTaskResponse>(task);
+            _mapper.Map(members, response.Members);
             return response;
         }
 
-        public async Task<UpdateTaskResponse> UpdateTask(int? userId, UpdateTaskRequest request)
+        public async Task<TaskDetailDTO> AddTask(CreateTaskDTO request)
         {
-            var user = await CheckUser(userId);
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.listTaskId);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.Id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, listTask.Project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.Update(user, request.Name, request.Description);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var response = _mapper.Map<UpdateTaskResponse>(task);
-            return response;
+            var task = _mapper.Map<Domain.Entities.Tasks.Task>(request);
+            task.ListTask = listTask;
+            var created = await _taskManager.AddTask(task);
+            if (created == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            return _mapper.Map<TaskDetailDTO>(task);
         }
 
-        public async Task<GetOneTaskResponse> GetOne(int? userId, GetOneTaskRequest request)
+        public async System.Threading.Tasks.Task UpdateTask(TaskDetailDTO request)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(request.Id);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.Id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
-
-            var todos = await UnitOfWork.todoRepository.GetAllByTask(task.Id);
-            var members = await UnitOfWork.userRepository.GetAllByTask(task);
-            var response = _mapper.Map<GetOneTaskResponse>(task);
-            response.Todos = _mapper.Map<List<TodoDTO>>(todos);
-            foreach (TodoDTO item in response.Todos)
-            {
-                item.SubTodos = _mapper.Map<List<SubTodoDTO>>(await UnitOfWork.todoRepository.GetAllSubTodosByTodo(item.Id));
-            }
-            response.Members = _mapper.Map<List<UserDTO>>(members);
-            return response;
+            if (!await _taskManager.UpdateTask(task, _mapper.Map<Domain.Entities.Tasks.Task>(request))) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<RemoveTodoResponse> RemoveTodo(int? userId, RemoveTodoRequest request)
+        public async System.Threading.Tasks.Task DeleteTask(Guid Id)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(Id);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.GetOneByTodo(request.Id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.RemoveTodo(user, request.Id);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var todos = await UnitOfWork.todoRepository.GetAllByTask(task.Id);
-            var response = _mapper.Map<RemoveTodoResponse>(task);
-            response.Todos = _mapper.Map<List<TodoDTO>>(todos);
-            foreach (TodoDTO item in response.Todos)
-            {
-                item.SubTodos = _mapper.Map<List<SubTodoDTO>>(await UnitOfWork.todoRepository.GetAllSubTodosByTodo(item.Id));
-            }
-            return response;
+            if (!await _taskManager.DeleteTask(task)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<AddTodoResponse> AddTodo(int? userId, AddTodoRequest request)
+        public async System.Threading.Tasks.Task RemoveTodo(Guid Id)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.TaskId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
+            var todo = await _unitOfWork.todoRepository.FindAsync(Id);
+            if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.AddTodo(user, request.Name, request.Description, request.ParentId);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var todos = await UnitOfWork.todoRepository.GetAllByTask(task.Id);
-            var response = _mapper.Map<AddTodoResponse>(task);
-            response.Todos = _mapper.Map<List<TodoDTO>>(todos);
-            foreach (TodoDTO item in response.Todos)
-            {
-                item.SubTodos = _mapper.Map<List<SubTodoDTO>>(await UnitOfWork.todoRepository.GetAllSubTodosByTodo(item.Id));
-            }
-            return response;
+            if (!await _taskManager.RemoveTodo(task, todo)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<AddAttachmentResponse> AddAttachment(int? userId, AddAttachmentRequest request)
+        public async System.Threading.Tasks.Task AddTodo(CreateTodoDTO request)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.taskId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
-
-            try
-            {
-                string? url = await UploadFiles.Upload(request.file);
-                if (url == null) throw new FileNotFoundException();
-
-                await UnitOfWork.BeginTransaction();
-                task.AddAttachment(user, request.file.FileName, request.file.ContentType, url);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var response = _mapper.Map<AddAttachmentResponse>(task);
-
-            return response;
+            if (!await _taskManager.AddTodo(task, _mapper.Map<Todo>(request))) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<RemoveAttachmentResponse> RemoveAttachment(int? userId, RemoveAttachmentRequest request)
+        public async System.Threading.Tasks.Task AddAttachment(CreateAttachmentDTO request)
         {
-            var user = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.GetOneByAttachment(request.Id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(task));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.RemoveAttachment(user, request.Id);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-
-            var response = _mapper.Map<RemoveAttachmentResponse>(task);
-
-            return response;
+            string? url = await UploadFiles.Upload(request.file);
+            if (url == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            var attachment = new Attachment(request.file.FileName, request.file.ContentType, url);
+            if (!await _taskManager.AddAttachment(task, attachment)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<AddAssgineeResponse> AddMember(int? userId, AddAssigneeRequest request)
+        public async System.Threading.Tasks.Task RemoveAttachment(Guid Id)
         {
-            var currentUser = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.GetOneByAttachment(Id);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.taskId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(currentUser) == false) throw new DirectoryNotFoundException(nameof(task));
+            var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
+            if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var user = await UnitOfWork.userRepository.FindAsync(request.userId);
-
-            if (task.HasMember(user) == true) throw new ArgumentException(nameof(task));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.AddMember(user);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-            var members = await UnitOfWork.userRepository.GetAllByTask(task);
-            var response = _mapper.Map<AddAssgineeResponse>(task);
-            response.Members = _mapper.Map<List<UserDTO>>(members);
-            return response;
+            if (!await _taskManager.RemoveAttachment(task, attachment)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<RemoveAssigneeResponse> RemoveMember(int? userId, RemoveAssgineeRequest request)
+        public async System.Threading.Tasks.Task AddMember(AssigmentDTO request)
         {
-            var currentUser = await CheckUser(userId);
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var task = await UnitOfWork.taskRepository.FindAsync(request.taskId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (task.HasOwner(currentUser) == false) throw new DirectoryNotFoundException(nameof(task));
+            var user = await _unitOfWork.userRepository.FindAsync(request.userId);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var user = await UnitOfWork.userRepository.FindAsync(request.userId);
+            if (task.HasMember(user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
-            if (task.HasMember(user) == false) throw new ArgumentException(nameof(task));
+            if (!await _taskManager.AddAssignment(task, user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
 
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                task.RemoveMember(user);
-                UnitOfWork.taskRepository.Update(task);
-                await UnitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
-            var members = await UnitOfWork.userRepository.GetAllByTask(task);
-            var response = _mapper.Map<RemoveAssigneeResponse>(task);
-            response.Members = _mapper.Map<List<UserDTO>>(members);
-            return response;
+        public async System.Threading.Tasks.Task RemoveMember(AssigmentDTO request)
+        {
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            var user = await _unitOfWork.userRepository.FindAsync(request.userId);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (!task.HasMember(user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+
+            if (!await _taskManager.RemoveAssignment(task, user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        public async System.Threading.Tasks.Task AddLabel(TaskLabelDTO request)
+        {
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
+            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+
+            if (!await _taskManager.AddLabel(task, label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        public async System.Threading.Tasks.Task RemoveLabel(TaskLabelDTO request)
+        {
+            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, task, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
+            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            if (!task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+
+            if (!await _taskManager.RemoveLabel(task, label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
     }
 }

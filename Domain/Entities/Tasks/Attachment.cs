@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities.Tasks
 {
-    public class Attachment : BaseEntity<int>
+    public class Attachment : Entity
     {
         public Attachment()
         {

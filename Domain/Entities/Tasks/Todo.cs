@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Entities.Tasks
 {
-    public partial class Todo : BaseEntity<int>
+    public partial class Todo : Entity
     {
         public Todo()
         {
@@ -19,7 +19,7 @@ namespace Domain.Entities.Tasks
         public bool IsDone { get; set; }
 
         [ForeignKey("Todo")]
-        public int? ParentId { get; set; }
+        public Guid? ParentId { get; set; }
 
         [Required]
         public virtual Task Task { get; set; }

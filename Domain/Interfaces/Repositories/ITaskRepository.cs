@@ -1,4 +1,4 @@
-﻿using Domain.Entities.ListTasks;
+﻿using Domain.Entities.Projects;
 
 namespace Domain.Interfaces.Repositories
 {
@@ -6,8 +6,8 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<List<Entities.Tasks.Task>> GetAllByListTask(ListTask listTask);
 
-        public Task<Entities.Tasks.Task> GetOneByTodo(int todoId);
+        public Task<Entities.Tasks.Task> GetOneByTodo(Guid todoId);
 
-        public Task<Entities.Tasks.Task> GetOneByAttachment(int attachmentId);
+        public Task<Entities.Tasks.Task> GetOneByAttachment(Guid attachmentId);
     }
 }

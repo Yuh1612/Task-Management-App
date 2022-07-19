@@ -18,7 +18,7 @@ namespace Infrastructure.Data.Repositories
             return projects.Where(x => x.HasOwner(user) == true).ToList();
         }
 
-        public async Task<Project?> GetOneByListTask(int listTaskId)
+        public async Task<Project> GetOneByListTask(Guid listTaskId)
         {
             var projects = await dbSet.Include(x => x.ListTasks).ToListAsync();
             foreach (var project in projects)
@@ -28,7 +28,7 @@ namespace Infrastructure.Data.Repositories
                     if (listtask.Id == listTaskId) return project;
                 }
             }
-            return null;
+            throw new KeyNotFoundException(nameof(listTaskId));
         }
     }
 }

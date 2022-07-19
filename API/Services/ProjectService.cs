@@ -1,153 +1,138 @@
 ﻿using API.DTOs.Projects;
-using API.DTOs.Users;
+using API.Extensions;
 using AutoMapper;
 using Domain.Entities.Projects;
 using Domain.Interfaces;
+using Domain.Interfaces.DomainServices;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace API.Services
 {
     public class ProjectService : BaseService
     {
-        private readonly IMapper _mapper;
+        private readonly IProjectManager _projectManager;
 
-        public ProjectService(IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork)
+        public ProjectService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper,
+            IAuthorizationService authorizationService, IProjectManager projectManager)
+            : base(unitOfWork, contextAccessor, mapper, authorizationService)
         {
-            _mapper = mapper;
+            _projectManager = projectManager;
         }
 
-        public async Task<GetOneProjectResponse> GetOne(int? userId, GetOneProjectRequest request)
+        public async Task<ProjectDTO> GetOne(Guid Id)
         {
-            var user = await CheckUser(userId);
+            var project = await _unitOfWork.projectRepository.FindAsync(Id);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var project = await UnitOfWork.projectRepository.FindAsync(request.Id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (project.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(project));
-
-            var members = await UnitOfWork.userRepository.GetAllByProject(project);
-
-            var response = _mapper.Map<GetOneProjectResponse>(project);
-            response.Members = _mapper.Map<List<UserDTO>>(members);
-
+            var members = await _unitOfWork.userRepository.GetAllByProject(project);
+            var response = _mapper.Map<ProjectDTO>(project);
+            _mapper.Map(members, response.Members);
             return response;
         }
 
-        public async Task<AddProjectResponse> AddProject(int? userId, AddProjectRequest request)
+        public async Task<ProjectDetailDTO> CreateProject(CreateProjectDTO request)
         {
-            var user = await CheckUser(userId);
-
-            if (user.HasProject(request.Name) == true) throw new ArgumentException(nameof(user));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-
-                var project = new Project(user, request.Name, request.Description);
-                project.AddMember(user, true);
-                await UnitOfWork.projectRepository.InsertAsync(project);
-
-                await UnitOfWork.CommitTransaction();
-
-                var response = _mapper.Map<AddProjectResponse>(project);
-                return response;
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
+            var user = await GetCurrentUser();
+            var project = await _projectManager.CreateProject(user, _mapper.Map<Project>(request));
+            return _mapper.Map<ProjectDetailDTO>(project);
         }
 
-        public async Task<UpdateProjectResponse> UpdateProject(int? userId, UpdateProjectRequest request)
+        public async Task DeleteProject(Guid Id)
         {
-            var user = await CheckUser(userId);
-
-            var project = await UnitOfWork.projectRepository.FindAsync(request.Id);
-
-            if (project.HasOwner(user) == false) throw new DirectoryNotFoundException(nameof(project));
-
-            if (user.HasProject(request.Name) == true) throw new ArgumentException(nameof(user));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-
-                project.Update(user, request.Name, request.Description);
-                UnitOfWork.projectRepository.Update(project);
-
-                await UnitOfWork.CommitTransaction();
-
-                var response = _mapper.Map<UpdateProjectResponse>(project);
-                return response;
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
+            var project = await _unitOfWork.projectRepository.FindAsync(Id);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            if (!await _projectManager.DeleteProject(project)) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<AddMemberResponse> AddMember(int? userId, AddMemberRequest request)
+        public async Task UpdateProject(ProjectDetailDTO request)
         {
-            var currentUser = await CheckUser(userId);
+            var project = await _unitOfWork.projectRepository.FindAsync(request.Id);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var currentProject = await UnitOfWork.projectRepository.FindAsync(request.ProjectId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (currentProject.HasOwner(currentUser) == false) throw new DirectoryNotFoundException(nameof(currentProject));
-
-            var user = await UnitOfWork.userRepository.FindAsync(request.UserId);
-
-            if (user == null) throw new KeyNotFoundException(nameof(user));
-
-            if (currentProject.HasMember(user) == true) throw new ArgumentException(nameof(user));
-
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                currentProject.AddMember(user);
-                await UnitOfWork.CommitTransaction();
-
-                var members = await UnitOfWork.userRepository.GetAllByProject(currentProject);
-                var response = _mapper.Map<AddMemberResponse>(currentProject);
-                response.Members = _mapper.Map<List<UserDTO>>(members);
-                return response;
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
+            if (!await _projectManager.UpdateProject(project, _mapper.Map<Project>(request))) throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
-        public async Task<RemoveMemberResponse> RemoveMember(int? userId, RemoveMemberRequest request)
+        public async Task AddMember(ProjectMemberDTO request)
         {
-            var currentUser = await CheckUser(userId);
+            var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var currentProject = await UnitOfWork.projectRepository.FindAsync(request.ProjectId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            if (currentProject.HasOwner(currentUser) == false) throw new DirectoryNotFoundException(nameof(currentProject));
+            var member = await _unitOfWork.userRepository.FindAsync(request.userId);
+            if (member == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (project.HasMember(member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
-            var user = await UnitOfWork.userRepository.FindAsync(request.UserId);
+            if (!await _projectManager.AddMember(project, member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
 
-            if (user == null) throw new KeyNotFoundException(nameof(user));
+        public async Task RemoveMember(ProjectMemberDTO request)
+        {
+            var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (currentProject.HasMember(user) == false) throw new DirectoryNotFoundException(nameof(user));
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            try
-            {
-                await UnitOfWork.BeginTransaction();
-                currentProject.RemoveMember(user);
-                await UnitOfWork.CommitTransaction();
+            var member = await _unitOfWork.userRepository.FindAsync(request.userId);
+            if (member == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (!project.HasMember(member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
-                var members = await UnitOfWork.userRepository.GetAllByProject(currentProject);
-                var response = _mapper.Map<RemoveMemberResponse>(currentProject);
-                response.Members = _mapper.Map<List<UserDTO>>(members);
-                return response;
-            }
-            catch
-            {
-                await UnitOfWork.RollbackTransaction();
-                throw;
-            }
+            if (!await _projectManager.RemoveMember(project, member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        public async Task<ListTaskDTO> GetOneListTask(Guid Id)
+        {
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, listTask.Project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            return _mapper.Map<ListTaskDTO>(listTask);
+        }
+
+        public async Task CreateListTask(CreateListTaskDTO request)
+        {
+            var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
+            if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            if (!await _projectManager.CreateListTask(project, _mapper.Map<ListTask>(request))) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        public async Task RemoveListTask(Guid Id)
+        {
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, listTask.Project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            if (!await _projectManager.RemoveListTask(listTask.Project, listTask)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+        }
+
+        public async Task UpdateListTask(ListTaskDetailDTO request)
+        {
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.Id);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(_contextAccessor.HttpContext.User, listTask.Project, "HasUser");
+            if (!authorizationResult.Succeeded) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+            if (!await _projectManager.UpdateListTask(listTask, _mapper.Map<ListTask>(request))) throw new HttpResponseException(HttpStatusCode.BadRequest); ;
         }
     }
 }

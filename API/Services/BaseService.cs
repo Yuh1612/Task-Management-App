@@ -1,23 +1,39 @@
-﻿using Domain.Entities.Users;
+﻿using API.Extensions;
+using AutoMapper;
+using Domain.Entities.Users;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Services
 {
-    public class BaseService
+    public abstract class BaseService
     {
-        protected IUnitOfWork UnitOfWork { get; set; }
+        protected readonly IUnitOfWork _unitOfWork;
+        protected readonly IHttpContextAccessor _contextAccessor;
+        protected readonly IMapper _mapper;
+        protected readonly IAuthorizationService _authorizationService;
 
-        public BaseService(IUnitOfWork unitOfWork)
+        public BaseService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper, IAuthorizationService authorizationService)
         {
-            UnitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
+            _contextAccessor = contextAccessor;
+            _mapper = mapper;
+            _authorizationService = authorizationService;
         }
 
-        public async Task<User> CheckUser(int? userId)
+        public async Task<User> GetCurrentUser()
         {
-            if (userId == null) throw new KeyNotFoundException(nameof(userId));
-            var user = await UnitOfWork.userRepository.FindAsync(userId);
-            if (user == null) throw new KeyNotFoundException(nameof(user));
-            return user;
+            try
+            {
+                var userId = _contextAccessor.HttpContext?.User.Claims.First(i => i.Type == "UserId").Value;
+                var user = await _unitOfWork.userRepository.FindAsync(Guid.Parse(userId));
+                if (user == null) throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+                return user;
+            }
+            catch
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
+            }
         }
     }
 }

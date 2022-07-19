@@ -10,12 +10,12 @@ namespace Infrastructure.Data.Repositories
         {
         }
 
-        public async Task<List<Todo>> GetAllByTask(int taskId)
+        public async Task<List<Todo>> GetAllByTask(Guid taskId)
         {
-            return await dbSet.Where(t => t.Task.Id == taskId && t.ParentId == null).ToListAsync();
+            return await dbSet.Where(t => t.Task.Id == taskId && t.ParentId == Guid.Empty).ToListAsync();
         }
 
-        public async Task<List<Todo>> GetAllSubTodosByTodo(int parentId)
+        public async Task<List<Todo>> GetAllSubTodosByTodo(Guid parentId)
         {
             return await dbSet.Where(t => t.ParentId == parentId).ToListAsync();
         }

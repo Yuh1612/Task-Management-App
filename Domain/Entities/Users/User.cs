@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities.Users
 {
-    public partial class User : BaseEntity<int>
+    public partial class User : Entity
     {
         public User()
         {

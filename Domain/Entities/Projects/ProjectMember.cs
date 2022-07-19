@@ -3,11 +3,10 @@ using Domain.Entities.Users;
 
 namespace Domain.Entities.Projects
 {
-    public class ProjectMember : BaseEntity<int>
+    public class ProjectMember : Entity
     {
         public ProjectMember()
         {
-
         }
 
         public ProjectMember(Project project, User user, bool isCreated)
@@ -17,11 +16,11 @@ namespace Domain.Entities.Projects
             IsCreated = isCreated;
         }
 
-        public int? ProjectId { get; set; }
+        public Guid? ProjectId { get; set; }
 
         public virtual Project Project { get; set; }
 
-        public int? UserId { get; set; }
+        public Guid? UserId { get; set; }
 
         public virtual User User { get; set; }
 

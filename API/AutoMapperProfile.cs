@@ -1,12 +1,12 @@
-﻿using API.DTOs.ListTasks;
+﻿using API.DTOs.Histories;
 using API.DTOs.Projects;
 using API.DTOs.Tasks;
 using API.DTOs.Users;
 using AutoMapper;
-using Domain.Entities.ListTasks;
 using Domain.Entities.Projects;
 using Domain.Entities.Tasks;
 using Domain.Entities.Users;
+using Domain.Histories;
 
 namespace API
 {
@@ -14,37 +14,33 @@ namespace API
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, AddUserResponse>();
-            CreateMap<User, UpdateUserResponse>();
-            CreateMap<User, GetOneUserResponse>();
             CreateMap<User, UserDTO>();
+            CreateMap<User, UserMinDTO>();
+            CreateMap<User, UserDetailDTO>();
+            CreateMap<CreateUserDTO, User>();
+            CreateMap<UpdateUserDTO, User>();
 
             CreateMap<Project, ProjectDTO>();
-            CreateMap<Project, GetOneProjectResponse>();
-            CreateMap<Project, UpdateProjectResponse>();
-            CreateMap<Project, AddProjectResponse>();
-            CreateMap<Project, DTOs.Projects.AddMemberResponse>();
-            CreateMap<Project, DTOs.Projects.RemoveMemberResponse>();
+            CreateMap<Project, ProjectDetailDTO>();
+            CreateMap<ProjectDetailDTO, Project>();
+            CreateMap<CreateProjectDTO, Project>();
 
             CreateMap<ListTask, ListTaskDTO>();
-            CreateMap<ListTask, GetOneListTaskResponse>();
-            CreateMap<ListTask, AddListTaskResponse>();
-            CreateMap<ListTask, UpdateListTaskResponse>();
+            CreateMap<ListTask, ListTaskDetailDTO>();
+            CreateMap<ListTaskDetailDTO, ListTask>();
+            CreateMap<CreateListTaskDTO, ListTask>();
 
             CreateMap<Domain.Entities.Tasks.Task, TaskDTO>();
-            CreateMap<Domain.Entities.Tasks.Task, AddTaskResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, UpdateTaskResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, GetOneTaskResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, AddTodoResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, AddAttachmentResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, RemoveAttachmentResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, DTOs.Tasks.AddAssgineeResponse>();
-            CreateMap<Domain.Entities.Tasks.Task, DTOs.Tasks.RemoveAssigneeResponse>();
-
+            CreateMap<Domain.Entities.Tasks.Task, TaskDetailDTO>();
+            CreateMap<TaskDetailDTO, Domain.Entities.Tasks.Task>();
+            CreateMap<CreateTaskDTO, Domain.Entities.Tasks.Task>();
             CreateMap<Todo, TodoDTO>();
+            CreateMap<CreateTodoDTO, Todo>();
             CreateMap<Todo, SubTodoDTO>();
-
             CreateMap<Attachment, AttachmentDTO>();
+            CreateMap<Label, LabelDTO>();
+
+            CreateMap<History, HistoryDTO>();
         }
     }
 }
