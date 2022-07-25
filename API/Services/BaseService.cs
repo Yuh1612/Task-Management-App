@@ -1,8 +1,8 @@
 ﻿using API.Extensions;
 using AutoMapper;
+using Domain.Entities.Projects;
 using Domain.Entities.Users;
 using Domain.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 
 namespace API.Services
 {
@@ -11,14 +11,12 @@ namespace API.Services
         protected readonly IUnitOfWork _unitOfWork;
         protected readonly IHttpContextAccessor _contextAccessor;
         protected readonly IMapper _mapper;
-        protected readonly IAuthorizationService _authorizationService;
 
-        public BaseService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper, IAuthorizationService authorizationService)
+        public BaseService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _contextAccessor = contextAccessor;
             _mapper = mapper;
-            _authorizationService = authorizationService;
         }
 
         public async Task<User> GetCurrentUser()
@@ -34,6 +32,13 @@ namespace API.Services
             {
                 throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
             }
+        }
+
+        public async Task<bool> ProjectAuthorize(Project project)
+        {
+            var user = await GetCurrentUser();
+            if (project.HasOwner(user) || project.HasMember(user)) return true;
+            return false;
         }
     }
 }

@@ -4,8 +4,6 @@ using AutoMapper;
 using Domain.Entities.Users;
 using Domain.Interfaces;
 using Domain.Interfaces.Authentications;
-using Domain.Interfaces.DomainServices;
-using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
 namespace API.Services
@@ -13,13 +11,10 @@ namespace API.Services
     public class UserService : BaseService
     {
         public readonly IJwtHandler _jwtHandler;
-        private readonly IUserManager _userManager;
 
-        public UserService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper,
-            IAuthorizationService authorizationService, IJwtHandler jwtHandler, IUserManager userManager)
-            : base(unitOfWork, contextAccessor, mapper, authorizationService)
+        public UserService(IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IMapper mapper, IJwtHandler jwtHandler)
+            : base(unitOfWork, contextAccessor, mapper)
         {
-            _userManager = userManager;
             _jwtHandler = jwtHandler;
         }
 
@@ -34,8 +29,10 @@ namespace API.Services
         public async Task<UserDTO> GetInfo(string AccessToken)
         {
             var userId = _jwtHandler.GetUserId(AccessToken);
+
             var user = await _unitOfWork.userRepository.FindAsync(userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
             var projects = await _unitOfWork.projectRepository.GetAllByUser(user);
             var response = _mapper.Map<UserDTO>(user);
             _mapper.Map(projects, response.Projects);
@@ -44,16 +41,30 @@ namespace API.Services
 
         public async Task<UserDetailDTO> CreateUser(CreateUserDTO request)
         {
-            if (await _unitOfWork.userRepository.IsExistUserName(request.UserName)) throw new HttpResponseException(HttpStatusCode.BadRequest);
-            var user = await _userManager.AddUser(_mapper.Map<User>(request));
-            if (user == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
-            return _mapper.Map<UserDetailDTO>(user);
+            if (await _unitOfWork.userRepository.IsExistUserName(request.UserName))
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            try
+            {
+                var user = _mapper.Map<User>(request);
+                user.HashPassWord();
+                await _unitOfWork.BeginTransaction();
+                await _unitOfWork.userRepository.InsertAsync(user);
+                await _unitOfWork.CommitTransaction(false);
+                return _mapper.Map<UserDetailDTO>(user);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
         }
 
         public async Task<UserTokenDTO> ValidateUser(UserAccountDTO request)
         {
             var user = await _unitOfWork.userRepository.GetOneByUserName(request.UserName);
-            if (user == null || !user.HasPassword(request.Password)) throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            if (user == null || !user.HasPassword(request.Password))
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
             var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
             try
             {
@@ -73,8 +84,11 @@ namespace API.Services
         public async Task<UserTokenDTO> RefreshToken(UserTokenDTO request)
         {
             var userId = _jwtHandler.ValidateAccessToken(request.AccessToken);
+
             var user = await _unitOfWork.userRepository.FindAsync(userId);
-            if (user == null || !user.HasRefreshToken(request.RefreshToken) || user.IsRefreshTokenExpired()) throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            if (user == null || !user.HasRefreshToken(request.RefreshToken) || user.IsRefreshTokenExpired())
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
             var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
             try
             {
@@ -93,9 +107,19 @@ namespace API.Services
 
         public async Task UpdateUser(UpdateUserDTO request)
         {
-            var oldUser = await GetCurrentUser();
-            var newUser = _mapper.Map<User>(request);
-            if (!await _userManager.UpdateUser(oldUser, newUser)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            var user = await GetCurrentUser();
+            try
+            {
+                await _unitOfWork.BeginTransaction();
+                user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
+                _unitOfWork.userRepository.Update(user);
+                await _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
         }
     }
 }

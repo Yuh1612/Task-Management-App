@@ -1,14 +1,11 @@
 using API;
 using API.Authentications;
-using API.Authorizations;
 using API.Extensions;
 using API.Services;
-using Domain.DomainServices;
 using Domain.Entities.Projects.Events;
 using Domain.Entities.Users.Events;
 using Domain.Interfaces;
 using Domain.Interfaces.Authentications;
-using Domain.Interfaces.DomainServices;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Infrastructure.Data;
@@ -44,13 +41,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("HasUser", policy => policy.Requirements.Add(new HasUserRequirement()));
-});
-
-builder.Services.AddScoped<IAuthorizationHandler, ProjectAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, TaskAuthorizationHandler>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<HttpResponseExceptionFilter>();
@@ -63,7 +53,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(typeof(CreateUserDomainEvent).GetTypeInfo().Assembly);
 builder.Services.AddMediatR(typeof(DeleteListTaskDomainEvent).GetTypeInfo().Assembly);
-builder.Services.AddMediatR(typeof(DeleteUserDomainEvent).GetTypeInfo().Assembly);
 
 builder.Services.AddScoped<ApplicationDbContext>();
 
@@ -81,10 +70,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IJwtHandler, JwtHandler>();
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddScoped<IUserManager, UserManager>();
-builder.Services.AddScoped<IProjectManager, ProjectManager>();
-builder.Services.AddScoped<ITaskManager, TaskManager>();
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ProjectService>();

@@ -24,9 +24,7 @@ namespace API.Authentications
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("UserId", user.Id.ToString()),
-                    new Claim(ClaimTypes.Hash, user.Id.ToString()),
                     new Claim("UserName", user.UserName),
-                    new Claim(ClaimTypes.Name, user.Name),
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(1),

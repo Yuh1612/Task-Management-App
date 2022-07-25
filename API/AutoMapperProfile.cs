@@ -1,5 +1,4 @@
-﻿using API.DTOs.Histories;
-using API.DTOs.Projects;
+﻿using API.DTOs.Projects;
 using API.DTOs.Tasks;
 using API.DTOs.Users;
 using AutoMapper;
@@ -39,8 +38,6 @@ namespace API
             CreateMap<Todo, SubTodoDTO>();
             CreateMap<Attachment, AttachmentDTO>();
             CreateMap<Label, LabelDTO>();
-
-            CreateMap<History, HistoryDTO>();
         }
     }
 }

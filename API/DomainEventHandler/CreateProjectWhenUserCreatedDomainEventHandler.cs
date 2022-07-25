@@ -1,7 +1,6 @@
 ﻿using Domain.Entities.Projects;
 using Domain.Entities.Users.Events;
 using Domain.Interfaces;
-using Domain.Interfaces.DomainServices;
 using MediatR;
 
 namespace API.DomainEventHandler
