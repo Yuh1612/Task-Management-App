@@ -1,5 +1,4 @@
 ﻿using Domain.Base;
-using Domain.Entities.Users;
 
 namespace Domain.Entities.Projects.Events
 {

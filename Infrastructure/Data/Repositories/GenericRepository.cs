@@ -1,6 +1,5 @@
 ﻿using Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Infrastructure.Data.Repositories
 {

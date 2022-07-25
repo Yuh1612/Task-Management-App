@@ -104,19 +104,19 @@ namespace Domain.Entities.Tasks
         public void Delete()
         {
             IsDelete = true;
-            foreach(var taskMember in TaskMembers)
+            foreach (var taskMember in TaskMembers)
             {
                 taskMember.IsDelete = true;
             }
-            foreach(var todo in Todos)
+            foreach (var todo in Todos)
             {
                 todo.IsDelete = true;
             }
-            foreach(var attachment in Attachments)
+            foreach (var attachment in Attachments)
             {
                 attachment.IsDelete = true;
             }
-            foreach(var label in Labels)
+            foreach (var label in Labels)
             {
                 RemoveLabel(label);
             }

@@ -1,10 +1,10 @@
 ﻿using Domain.Entities.Projects;
-using Domain.Entities.Users;
-using Microsoft.EntityFrameworkCore;
 using Domain.Entities.Tasks;
-using MediatR;
+using Domain.Entities.Users;
 using Domain.Histories;
+using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {

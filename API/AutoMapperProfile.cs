@@ -5,7 +5,6 @@ using AutoMapper;
 using Domain.Entities.Projects;
 using Domain.Entities.Tasks;
 using Domain.Entities.Users;
-using Domain.Histories;
 
 namespace API
 {

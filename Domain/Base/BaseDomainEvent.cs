@@ -1,5 +1,4 @@
-﻿using Domain.Entities.Users;
-using MediatR;
+﻿using MediatR;
 
 namespace Domain.Base
 {

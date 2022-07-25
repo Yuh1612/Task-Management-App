@@ -12,7 +12,6 @@ using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;

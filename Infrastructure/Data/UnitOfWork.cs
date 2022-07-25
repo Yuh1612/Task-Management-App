@@ -1,7 +1,5 @@
-﻿using Domain.Entities.Users;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
