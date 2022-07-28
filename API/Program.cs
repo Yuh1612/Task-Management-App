@@ -52,6 +52,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(typeof(CreateUserDomainEvent).GetTypeInfo().Assembly);
 builder.Services.AddMediatR(typeof(DeleteListTaskDomainEvent).GetTypeInfo().Assembly);
+builder.Services.AddMediatR(typeof(DeleteProjectDomainEvent).GetTypeInfo().Assembly);
 
 builder.Services.AddScoped<ApplicationDbContext>();
 

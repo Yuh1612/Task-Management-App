@@ -19,8 +19,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, task);
 
-            //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             var todos = await _unitOfWork.todoRepository.GetAllByTask(task.Id);
             var members = await _unitOfWork.userRepository.GetAllByTask(task.Id);
             var response = _mapper.Map<TaskDTO>(task);
@@ -38,8 +36,6 @@ namespace API.Services
         {
             var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.listTaskId);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            //if (!await ProjectAuthorize(listTask.Project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
@@ -61,8 +57,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(request.Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -82,8 +76,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -102,8 +94,6 @@ namespace API.Services
         {
             var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var todo = await _unitOfWork.todoRepository.FindAsync(Id);
             if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -127,8 +117,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -147,8 +135,6 @@ namespace API.Services
         {
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             string? url = await UploadFiles.Upload(request.file);
             if (url == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
@@ -173,8 +159,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.GetOneByAttachment(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
             if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -196,8 +180,6 @@ namespace API.Services
         {
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -223,8 +205,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -249,8 +229,6 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
             if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -274,8 +252,6 @@ namespace API.Services
         {
             var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            // if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
             if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);

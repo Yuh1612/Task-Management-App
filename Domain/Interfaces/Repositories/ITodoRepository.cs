@@ -4,8 +4,8 @@ namespace Domain.Interfaces.Repositories
 {
     public interface ITodoRepository : IGenericRepository<Todo>
     {
-        public Task<List<Todo>> GetAllByTask(Guid taskId);
+        Task<List<Todo>> GetAllByTask(Guid taskId);
 
-        public Task<List<Todo>> GetAllSubTodosByTodo(Guid parentId);
+        Task<List<Todo>> GetAllSubTodosByTodo(Guid parentId);
     }
 }
