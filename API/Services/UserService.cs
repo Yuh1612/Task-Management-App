@@ -56,6 +56,7 @@ namespace API.Services
                 user.HashPassWord();
                 await _unitOfWork.BeginTransaction();
                 await _unitOfWork.userRepository.InsertAsync(user);
+                user.AddCreateUserDomainEvent();
                 await _unitOfWork.CommitTransaction(false);
                 return _mapper.Map<UserDetailDTO>(user);
             }
@@ -114,7 +115,7 @@ namespace API.Services
 
         public async Task UpdateUser(UpdateUserDTO request)
         {
-            var user = await GetCurrentUser();
+            var user = await _unitOfWork.userRepository.FindAsync(GetCurrentUserId());
             try
             {
                 await _unitOfWork.BeginTransaction();

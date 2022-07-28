@@ -22,7 +22,7 @@ namespace API.Services
             //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var todos = await _unitOfWork.todoRepository.GetAllByTask(task.Id);
-            var members = await _unitOfWork.userRepository.GetAllByTask(task);
+            var members = await _unitOfWork.userRepository.GetAllByTask(task.Id);
             var response = _mapper.Map<TaskDTO>(task);
             _mapper.Map(todos, response.Todos);
             foreach (var todo in response.Todos)
@@ -202,7 +202,7 @@ namespace API.Services
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (task.HasMember(user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
             try
             {
@@ -228,7 +228,7 @@ namespace API.Services
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!task.HasMember(user)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (!task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
             try
             {

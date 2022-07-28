@@ -20,7 +20,7 @@ namespace API.DomainEventHandler
             {
                 await _unitOfWork.BeginTransaction();
                 var currentProject = new Project("Main Project");
-                currentProject.AddMember(notification.user, true);
+                currentProject.AddMember(notification.user.Id, true);
                 await _unitOfWork.projectRepository.InsertAsync(currentProject);
                 currentProject.AddListTask(new ListTask("Planning"));
                 currentProject.AddListTask(new ListTask("To-do"));
