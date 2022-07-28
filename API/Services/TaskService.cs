@@ -36,7 +36,6 @@ namespace API.Services
 
             if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -162,7 +161,6 @@ namespace API.Services
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
 
             var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
             if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound);

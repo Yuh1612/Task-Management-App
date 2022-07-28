@@ -1,5 +1,4 @@
-﻿using API.DTOs.Projects;
-using API.DTOs.Users;
+﻿using API.DTOs.Users;
 using API.Extensions;
 using AutoMapper;
 using Domain.Entities.Users;

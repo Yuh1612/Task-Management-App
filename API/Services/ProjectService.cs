@@ -1,5 +1,4 @@
 ﻿using API.DTOs.Projects;
-using API.DTOs.Users;
 using API.Extensions;
 using AutoMapper;
 using Domain.Entities.Projects;
@@ -25,7 +24,6 @@ namespace API.Services
         {
             var project = await _unitOfWork.projectRepository.GetProject(projectId, GetCurrentUserId());
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
 
             var response = _mapper.Map<ProjectDTO>(project);
             _mapper.Map(project.ProjectMembers.Select(s => s.User), response.Members);

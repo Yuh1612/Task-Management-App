@@ -1,7 +1,4 @@
-﻿using API.Extensions;
-using AutoMapper;
-using Domain.Entities.Projects;
-using Domain.Entities.Users;
+﻿using AutoMapper;
 using Domain.Interfaces;
 
 namespace API.Services

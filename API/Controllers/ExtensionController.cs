@@ -12,6 +12,7 @@ namespace API.Controllers
     public class ExtensionController : ApplicationController
     {
         private readonly IMapper _mapper;
+
         public ExtensionController(IMapper mapper)
         {
             _mapper = mapper;
