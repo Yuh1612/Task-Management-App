@@ -22,7 +22,7 @@ namespace API.Services
 
         public async Task<ProjectDTO> GetOne(Guid projectId)
         {
-            var project = await _unitOfWork.projectRepository.FindAsync(projectId);
+            var project = await _unitOfWork.projectRepository.GetProject(projectId, GetCurrentUser());
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             //if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);

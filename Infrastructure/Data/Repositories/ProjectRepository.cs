@@ -15,5 +15,15 @@ namespace Infrastructure.Data.Repositories
         {
             return dbSet.Where(x => x.ProjectMembers.Any(x => x.UserId == userId)).ToList();
         }
+
+        public  Project? GetProject(Guid projectId, Guid userId)
+        {
+            var project = dbSet.FirstOrDefault(c => c.Id == projectId);
+            if(project != null)
+            {
+                return project.ProjectMembers.Where(c => c.UserId == userId).Select(c => c.Project).First();
+            }
+            return null;
+        }
     }
 }
