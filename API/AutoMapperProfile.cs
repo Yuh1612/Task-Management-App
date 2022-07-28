@@ -12,7 +12,6 @@ namespace API
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserDTO>();
             CreateMap<User, UserMinDTO>();
             CreateMap<User, UserDetailDTO>();
             CreateMap<CreateUserDTO, User>();
