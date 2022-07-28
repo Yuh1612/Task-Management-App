@@ -10,7 +10,7 @@ namespace API.Controllers
     [Authorize]
     public class ProjectController : ApplicationController
     {
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetAll([FromServices] ProjectService projectService)
         {
             return Ok(await projectService.GetAll());
