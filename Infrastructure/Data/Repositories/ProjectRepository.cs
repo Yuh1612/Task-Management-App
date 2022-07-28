@@ -16,12 +16,12 @@ namespace Infrastructure.Data.Repositories
             return await dbSet.Where(x => x.ProjectMembers.Any(x => x.UserId == userId)).ToListAsync();
         }
 
-        public  Project? GetProject(Guid projectId, Guid userId)
+        public  async Task<Project?> GetProject(Guid projectId, Guid userId)
         {
-            var project = dbSet.FirstOrDefault(c => c.Id == projectId);
+            var project = await dbSet.FirstOrDefaultAsync(c => c.Id == projectId);
             if(project != null)
             {
-                return project.ProjectMembers.Where(c => c.UserId == userId).Select(c => c.Project).First();
+                return project.ProjectMembers.Where(c => c.UserId == userId).Select(c => c.Project).FirstOrDefault();
             }
             return null;
         }

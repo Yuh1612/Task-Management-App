@@ -23,5 +23,15 @@ namespace Infrastructure.Data.Repositories
             if (task == null) throw new KeyNotFoundException(nameof(task));
             return task;
         }
+
+        public async Task<Domain.Entities.Tasks.Task?> GetTask(Guid taskId, Guid userId)
+        {
+            var task = await dbSet.FirstOrDefaultAsync(c => c.Id == taskId);
+            if (task != null)
+            {
+                return task.ListTask.Project.ProjectMembers.Where(c => c.UserId == userId).Count() > 0 ? task : null;
+            }
+            return null;
+        }
     }
 }
