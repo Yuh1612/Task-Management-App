@@ -25,11 +25,7 @@ namespace API.Services
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var response = _mapper.Map<UserMinDTO>(user);
-
-            foreach (var i in user.ProjectMembers)
-            {
-                response.Projects.Add(_mapper.Map<ProjectDetailDTO>(i.Project));
-            }
+            _mapper.Map(user.ProjectMembers.Select(s => s.Project), response.Projects);
 
             return response;
         }

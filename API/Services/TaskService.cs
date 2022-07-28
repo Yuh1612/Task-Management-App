@@ -19,18 +19,14 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.FindAsync(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, task);
 
-            //if (!await TaskAuthorize(task)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            var todos = await _unitOfWork.todoRepository.GetAllByTask(task.Id);
-            var members = await _unitOfWork.userRepository.GetAllByTask(task.Id);
             var response = _mapper.Map<TaskDTO>(task);
-            _mapper.Map(todos, response.Todos);
+            _mapper.Map(task.Todos.Where(s => s.ParentId == Guid.Empty).Select(s => s), response.Todos);
+            _mapper.Map(task.TaskMembers.Select(s => s.User), response.Members);
             foreach (var todo in response.Todos)
             {
-                var subtodo = await _unitOfWork.todoRepository.GetAllSubTodosByTodo(todo.Id);
-                _mapper.Map(subtodo, todo.SubTodos);
+                _mapper.Map(task.Todos.Where(s => s.ParentId != Guid.Empty), todo.SubTodos);
             }
-            _mapper.Map(members, response.Members);
             return response;
         }
 

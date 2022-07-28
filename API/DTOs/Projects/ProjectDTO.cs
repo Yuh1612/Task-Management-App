@@ -3,7 +3,7 @@ using API.DTOs.Users;
 
 namespace API.DTOs.Projects
 {
-    public record ProjectDTO(Guid Id = default, string Name = default, string? Description = default, List<UserMinDTO> Members = default, List<ListTaskDetailDTO> ListTasks = default);
+    public record ProjectDTO(Guid Id = default, string Name = default, string? Description = default, List<UserDTO> Members = default, List<ListTaskDetailDTO> ListTasks = default);
     public record ProjectDetailDTO(Guid Id, string Name, string? Description);
     public record CreateProjectDTO(string Name, string? Description);
     public record ProjectMemberDTO(Guid projectId, Guid userId);
