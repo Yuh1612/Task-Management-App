@@ -23,7 +23,7 @@ namespace Infrastructure.Data.Repositories
             {
                 return project.ProjectMembers.Where(c => c.UserId == userId).Select(c => c.Project).FirstOrDefault();
             }
-            return null;
+            return project;
         }
     }
 }
