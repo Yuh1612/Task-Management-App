@@ -34,19 +34,9 @@ namespace Domain.Entities.Tasks
             });
         }
 
-        public bool HasTodo(Guid todoId)
-        {
-            return Todos.Any(x => x.Id == todoId);
-        }
-
         public void RemoveTodo(Todo todo)
         {
             todo.IsDelete = true;
-        }
-
-        public bool HasOwner(User user)
-        {
-            return ListTask.Project.HasOwner(user);
         }
 
         public bool HasMember(User user)

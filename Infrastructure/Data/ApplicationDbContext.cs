@@ -43,7 +43,7 @@ namespace Infrastructure.Data
         {
             optionsBuilder
                 .UseLazyLoadingProxies()
-                .UseSqlServer(@"Server=VT-PGH;Database=TaskManagementDB;Trusted_Connection=True;");
+                .UseSqlServer(@"server=192.168.2.231;database=Intern_TaskManagement;user id=sa;password=vStation123;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

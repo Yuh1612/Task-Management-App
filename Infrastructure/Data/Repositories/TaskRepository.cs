@@ -10,12 +10,6 @@ namespace Infrastructure.Data.Repositories
         {
         }
 
-        public async Task<List<Domain.Entities.Tasks.Task>> GetAllByListTask(ListTask listTask)
-        {
-            var tasks = dbSet.Where(t => t.ListTask.Id == listTask.Id);
-            return await tasks.ToListAsync();
-        }
-
         public async Task<Domain.Entities.Tasks.Task> GetOneByAttachment(Guid attachmentId)
         {
             var task = await dbSet.FirstOrDefaultAsync(t => t.Attachments.Any(t => t.Id == attachmentId) == true);

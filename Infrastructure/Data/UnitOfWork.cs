@@ -18,8 +18,6 @@ namespace Infrastructure.Data
 
         private IListTaskRepository _listTaskRepository;
 
-        private IProjectMemberRepository _projectMemberRepository;
-
         private ITaskRepository _taskRepository;
 
         private ITodoRepository _todoRepository;
@@ -36,7 +34,6 @@ namespace Infrastructure.Data
             IUserRepository userRepository,
             IProjectRepository projectRepository,
             IListTaskRepository listTaskRepository,
-            IProjectMemberRepository projectMemberRepository,
             ITaskRepository taskRepository,
             ITodoRepository todoRepository,
             IAttachmentRepository attachmentRepository,
@@ -47,7 +44,6 @@ namespace Infrastructure.Data
             _userRepository = userRepository;
             _projectRepository = projectRepository;
             _listTaskRepository = listTaskRepository;
-            _projectMemberRepository = projectMemberRepository;
             _taskRepository = taskRepository;
             _todoRepository = todoRepository;
             _attachmentRepository = attachmentRepository;
@@ -60,8 +56,6 @@ namespace Infrastructure.Data
         public IProjectRepository projectRepository => _projectRepository;
 
         public IListTaskRepository listTaskRepository => _listTaskRepository;
-
-        public IProjectMemberRepository projectMemberRepository => _projectMemberRepository;
 
         public ITaskRepository taskRepository => _taskRepository;
 

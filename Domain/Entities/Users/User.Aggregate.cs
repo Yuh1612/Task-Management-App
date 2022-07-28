@@ -62,11 +62,6 @@ namespace Domain.Entities.Users
             return RefreshTokenExpiredDay <= DateTime.UtcNow;
         }
 
-        public void Delete()
-        {
-            IsDelete = true;
-        }
-
         public bool HasProject(Project project)
         {
             return ProjectMembers.Any(m => m.ProjectId == project.Id);
@@ -75,16 +70,6 @@ namespace Domain.Entities.Users
         public bool HasTask(Tasks.Task task)
         {
             return TaskMembers.Any(m => m.TaskId == task.Id);
-        }
-
-        public bool HasProject(string? name)
-        {
-            return ProjectMembers.Any(m => m.Project.HasName(name));
-        }
-
-        public bool HasProject(Guid id)
-        {
-            return ProjectMembers.Any(m => m.Project.Id == id);
         }
 
         internal void AddProject(ProjectMember projectMember)

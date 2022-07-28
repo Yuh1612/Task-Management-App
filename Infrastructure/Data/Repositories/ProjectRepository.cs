@@ -11,24 +11,9 @@ namespace Infrastructure.Data.Repositories
         {
         }
 
-        public async Task<List<Project>> GetAllByUser(User user)
+        public async Task<List<Project>> GetAllByUser(Guid userId)
         {
-            var projects = await dbSet.Include(x => x.ProjectMembers).ToListAsync();
-
-            return projects.Where(x => x.HasOwner(user) == true).ToList();
-        }
-
-        public async Task<Project> GetOneByListTask(Guid listTaskId)
-        {
-            var projects = await dbSet.Include(x => x.ListTasks).ToListAsync();
-            foreach (var project in projects)
-            {
-                foreach (var listtask in project.ListTasks)
-                {
-                    if (listtask.Id == listTaskId) return project;
-                }
-            }
-            throw new KeyNotFoundException(nameof(listTaskId));
+            return dbSet.Where(x => x.ProjectMembers.Any(x => x.UserId == userId)).ToList();
         }
     }
 }

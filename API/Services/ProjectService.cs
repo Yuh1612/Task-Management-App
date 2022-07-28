@@ -14,14 +14,20 @@ namespace API.Services
         {
         }
 
-        public async Task<ProjectDTO> GetOne(Guid Id)
+        public async Task<List<ProjectDetailDTO>> GetAll()
         {
-            var project = await _unitOfWork.projectRepository.FindAsync(Id);
+            var projects = await _unitOfWork.projectRepository.GetAllByUser(GetCurrentUserId());
+            return _mapper.Map<List<ProjectDetailDTO>>(projects);
+        }
+
+        public async Task<ProjectDTO> GetOne(Guid projectId)
+        {
+            var project = await _unitOfWork.projectRepository.FindAsync(projectId);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            //if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
-            var members = await _unitOfWork.userRepository.GetAllByProject(project);
+            var members = await _unitOfWork.userRepository.GetAllByProject(projectId);
             var response = _mapper.Map<ProjectDTO>(project);
             _mapper.Map(members, response.Members);
             return response;
@@ -29,12 +35,11 @@ namespace API.Services
 
         public async Task<ProjectDetailDTO> CreateProject(CreateProjectDTO request)
         {
-            var user = await GetCurrentUser();
             try
             {
                 await _unitOfWork.BeginTransaction();
                 var project = new Project(request.Name, request.Description);
-                project.AddMember(user, true);
+                project.AddMember(GetCurrentUserId(), true);
                 await _unitOfWork.projectRepository.InsertAsync(project);
                 project.AddListTask(new ListTask("Planning"));
                 project.AddListTask(new ListTask("To-do"));
@@ -54,7 +59,7 @@ namespace API.Services
             var project = await _unitOfWork.projectRepository.FindAsync(Id);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            //if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
@@ -75,7 +80,7 @@ namespace API.Services
             var project = await _unitOfWork.projectRepository.FindAsync(request.Id);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            //if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
@@ -96,16 +101,16 @@ namespace API.Services
             var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            //if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var member = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (member == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-            if (project.HasMember(member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (project.HasMember(member.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
             try
             {
                 await _unitOfWork.BeginTransaction();
-                project.AddMember(member);
+                project.AddMember(member.Id);
                 _unitOfWork.projectRepository.Update(project);
                 await _unitOfWork.CommitTransaction();
             }
@@ -121,16 +126,16 @@ namespace API.Services
             var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             var member = await _unitOfWork.userRepository.FindAsync(request.userId);
             if (member == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-            if (!project.HasMember(member)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (!project.HasMember(member.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
 
             try
             {
                 await _unitOfWork.BeginTransaction();
-                project.RemoveMember(member);
+                project.RemoveMember(member.Id);
                 _unitOfWork.projectRepository.Update(project);
                 await _unitOfWork.CommitTransaction();
             }
@@ -146,7 +151,7 @@ namespace API.Services
             var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(listTask.Project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // if (!await ProjectAuthorize(listTask.Project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             return _mapper.Map<ListTaskDTO>(listTask);
         }
@@ -156,7 +161,7 @@ namespace API.Services
             var project = await _unitOfWork.projectRepository.FindAsync(request.projectId);
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
@@ -179,7 +184,7 @@ namespace API.Services
 
             var project = listTask.Project;
 
-            if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // if (!await ProjectAuthorize(project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
@@ -200,7 +205,7 @@ namespace API.Services
             var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.Id);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            if (!await ProjectAuthorize(listTask.Project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            // if (!await ProjectAuthorize(listTask.Project)) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {

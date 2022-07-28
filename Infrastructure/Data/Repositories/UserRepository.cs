@@ -17,16 +17,14 @@ namespace Infrastructure.Data.Repositories
             return user;
         }
 
-        public async Task<List<User>> GetAllByProject(Project project)
+        public async Task<List<User>> GetAllByProject(Guid projectId)
         {
-            var users = await dbSet.ToListAsync();
-            return users.Where(x => x.HasProject(project) == true).ToList();
+            return dbSet.Where(x => x.ProjectMembers.Any(x => x.ProjectId == projectId)).ToList();
         }
 
-        public async Task<List<User>> GetAllByTask(Domain.Entities.Tasks.Task task)
+        public async Task<List<User>> GetAllByTask(Guid taskId)
         {
-            var users = await dbSet.ToListAsync();
-            return users.Where(x => x.HasTask(task) == true).ToList();
+            return dbSet.Where(x => x.TaskMembers.Any(x => x.TaskId == taskId)).ToList();
         }
 
         public Task<bool> IsExistUserName(string userName)

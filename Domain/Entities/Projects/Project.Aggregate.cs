@@ -1,5 +1,4 @@
 ﻿using Domain.Base;
-using Domain.Entities.Projects.Events;
 using Domain.Entities.Users;
 
 namespace Domain.Entities.Projects
@@ -21,44 +20,27 @@ namespace Domain.Entities.Projects
             Description = description ?? Description;
         }
 
-        public bool HasOwner(User user)
+        public void AddMember(Guid memberId, bool isCreated = false)
         {
-            return ProjectMembers.Any(p => p.UserId == user.Id && p.IsCreated == true);
-        }
-
-        public bool HasName(string? name)
-        {
-            if (name == null) return false;
-            return Name == name;
-        }
-
-        public void AddMember(User member, bool isCreated = false)
-        {
-            var projectMember = ProjectMembers.FirstOrDefault(x => x.UserId == member.Id);
+            var projectMember = ProjectMembers.FirstOrDefault(x => x.UserId == memberId);
             if (projectMember != null)
             {
                 projectMember.IsDelete = false;
                 return;
             }
-            projectMember = new ProjectMember(this, member, isCreated);
+            projectMember = new ProjectMember(Id, memberId, isCreated);
             ProjectMembers.Add(projectMember);
-            member.AddProject(projectMember);
         }
 
-        public void RemoveMember(User member)
+        public void RemoveMember(Guid memberId)
         {
-            var projectMember = ProjectMembers.First(p => p.UserId == member.Id);
+            var projectMember = ProjectMembers.First(p => p.UserId == memberId);
             projectMember.IsDelete = true;
         }
 
-        public bool HasMember(User member)
+        public bool HasMember(Guid memberId)
         {
-            return ProjectMembers.Any(p => p.UserId == member.Id);
-        }
-
-        public bool HasListTask(string name)
-        {
-            return ListTasks.Any(l => l.Name == name);
+            return ProjectMembers.Any(p => p.UserId == memberId);
         }
 
         public void AddListTask(ListTask listTask)
@@ -71,9 +53,6 @@ namespace Domain.Entities.Projects
         public void RemoveListTask(ListTask listTask)
         {
             listTask.IsDelete = true;
-
-            var removeEvent = new DeleteListTaskDomainEvent(listTask);
-            AddEvent(removeEvent);
         }
 
         public void UpdateListTask(ListTask listTask)
@@ -87,7 +66,7 @@ namespace Domain.Entities.Projects
             IsDelete = true;
             foreach (var listTask in ListTasks)
             {
-                RemoveListTask(listTask);
+                listTask.IsDelete = true;
             }
             foreach (var projectmember in ProjectMembers)
             {

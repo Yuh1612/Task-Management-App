@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Infrastructure.Data.Migrations
 {
-    public partial class FirstCreate : Migration
+    public partial class firstcreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,7 +14,7 @@ namespace Infrastructure.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Ref = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     RefId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Action = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
@@ -33,7 +34,8 @@ namespace Infrastructure.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Color = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false)
+                    Color = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,10 +49,6 @@ namespace Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -71,10 +69,6 @@ namespace Infrastructure.Data.Migrations
                     BirthDay = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RefreshToken = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     RefreshTokenExpiredDay = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -90,10 +84,6 @@ namespace Infrastructure.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -114,7 +104,8 @@ namespace Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsCreated = table.Column<bool>(type: "bit", nullable: false)
+                    IsCreated = table.Column<bool>(type: "bit", nullable: false),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,10 +130,6 @@ namespace Infrastructure.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ListTaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -164,7 +151,8 @@ namespace Infrastructure.Data.Migrations
                     FileName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     StorageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -208,7 +196,8 @@ namespace Infrastructure.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,7 +224,8 @@ namespace Infrastructure.Data.Migrations
                     IsDone = table.Column<bool>(type: "bit", nullable: false),
                     ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     TaskId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TodoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    TodoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDelete = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -251,6 +241,24 @@ namespace Infrastructure.Data.Migrations
                         column: x => x.TodoId,
                         principalTable: "Todos",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.InsertData(
+                table: "Labels",
+                columns: new[] { "Id", "Color", "IsDelete", "Title" },
+                values: new object[,]
+                {
+                    { new Guid("0598fc66-4ec4-45f5-a2cf-52ff729acd20"), "White", false, "VueJs" },
+                    { new Guid("066834ef-807b-4414-b9b5-253bf1abd38d"), "Black", false, "ReactJs" },
+                    { new Guid("2b225e43-f924-4514-b125-b001f68d4822"), "Pink", false, "PHP" },
+                    { new Guid("3c08448c-fc93-4c5a-8c34-e48ddd7cf12d"), "Blue", false, "Java" },
+                    { new Guid("4405f6b0-3019-4095-8441-aafcc8d36608"), "Black", false, "Flutter" },
+                    { new Guid("b025ff2d-4d33-4a84-a49f-c228eb795f55"), "Gray", false, "Dart" },
+                    { new Guid("c61e3da3-6b1a-4ec2-a229-b735864511ad"), "Orange", false, "Python" },
+                    { new Guid("d09bdfa2-6e43-4b06-bb16-88fa5ea50d27"), "Green", false, "NestJs" },
+                    { new Guid("d165ee37-a62b-4a9a-a418-bad940652cd7"), "Red", false, "Angular" },
+                    { new Guid("ed10a4a5-0f83-482f-b3ed-4b0156017606"), "Brown", false, "Golang" },
+                    { new Guid("f923ce44-176b-45f5-972f-25b216a7b93f"), "Purple", false, ".NET" }
                 });
 
             migrationBuilder.CreateIndex(

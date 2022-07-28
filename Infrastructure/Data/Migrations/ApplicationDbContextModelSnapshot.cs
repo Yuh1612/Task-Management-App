@@ -158,77 +158,77 @@ namespace Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9e765f9f-72a2-490b-a834-73b1c0d8c8bc"),
+                            Id = new Guid("f923ce44-176b-45f5-972f-25b216a7b93f"),
                             Color = "Purple",
                             IsDelete = false,
                             Title = ".NET"
                         },
                         new
                         {
-                            Id = new Guid("fb6ac416-d11a-427b-82e1-0cd94fbdded7"),
+                            Id = new Guid("3c08448c-fc93-4c5a-8c34-e48ddd7cf12d"),
                             Color = "Blue",
                             IsDelete = false,
                             Title = "Java"
                         },
                         new
                         {
-                            Id = new Guid("9e5e3460-e1e5-4f0c-aab3-f13691314093"),
+                            Id = new Guid("d09bdfa2-6e43-4b06-bb16-88fa5ea50d27"),
                             Color = "Green",
                             IsDelete = false,
                             Title = "NestJs"
                         },
                         new
                         {
-                            Id = new Guid("9a1f1f40-b5ec-4a4d-9eca-ef42e5c0671a"),
+                            Id = new Guid("066834ef-807b-4414-b9b5-253bf1abd38d"),
                             Color = "Black",
                             IsDelete = false,
                             Title = "ReactJs"
                         },
                         new
                         {
-                            Id = new Guid("73ed1499-b9f6-4e2a-b01e-bf446250d98c"),
+                            Id = new Guid("d165ee37-a62b-4a9a-a418-bad940652cd7"),
                             Color = "Red",
                             IsDelete = false,
                             Title = "Angular"
                         },
                         new
                         {
-                            Id = new Guid("b270569a-b9de-48c6-8014-0721b1c3744d"),
+                            Id = new Guid("c61e3da3-6b1a-4ec2-a229-b735864511ad"),
                             Color = "Orange",
                             IsDelete = false,
                             Title = "Python"
                         },
                         new
                         {
-                            Id = new Guid("c8dbb5c4-c9ce-4e73-b0f7-d66bd07e4a96"),
+                            Id = new Guid("0598fc66-4ec4-45f5-a2cf-52ff729acd20"),
                             Color = "White",
                             IsDelete = false,
                             Title = "VueJs"
                         },
                         new
                         {
-                            Id = new Guid("83df3d45-4c5a-402b-a7ac-2fc7bb4e1bf5"),
+                            Id = new Guid("4405f6b0-3019-4095-8441-aafcc8d36608"),
                             Color = "Black",
                             IsDelete = false,
                             Title = "Flutter"
                         },
                         new
                         {
-                            Id = new Guid("2d32c7a7-2a0d-4cae-8cfe-78f2b18e33b8"),
+                            Id = new Guid("b025ff2d-4d33-4a84-a49f-c228eb795f55"),
                             Color = "Gray",
                             IsDelete = false,
                             Title = "Dart"
                         },
                         new
                         {
-                            Id = new Guid("ccc50436-d056-4723-9bd5-492ab3a792d0"),
+                            Id = new Guid("ed10a4a5-0f83-482f-b3ed-4b0156017606"),
                             Color = "Brown",
                             IsDelete = false,
                             Title = "Golang"
                         },
                         new
                         {
-                            Id = new Guid("428cf5c2-96a4-4b09-bc02-d2c6ada686ba"),
+                            Id = new Guid("2b225e43-f924-4514-b125-b001f68d4822"),
                             Color = "Pink",
                             IsDelete = false,
                             Title = "PHP"

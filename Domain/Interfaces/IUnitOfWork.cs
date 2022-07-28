@@ -10,8 +10,6 @@ namespace Domain.Interfaces
 
         IListTaskRepository listTaskRepository { get; }
 
-        IProjectMemberRepository projectMemberRepository { get; }
-
         ITaskRepository taskRepository { get; }
 
         ITodoRepository todoRepository { get; }

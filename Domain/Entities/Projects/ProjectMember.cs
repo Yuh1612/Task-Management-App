@@ -9,10 +9,10 @@ namespace Domain.Entities.Projects
         {
         }
 
-        public ProjectMember(Project project, User user, bool isCreated)
+        public ProjectMember(Guid projectId, Guid userId, bool isCreated)
         {
-            Project = project;
-            User = user;
+            ProjectId = projectId;
+            UserId = userId;
             IsCreated = isCreated;
         }
 

@@ -17,6 +17,13 @@ namespace API.Controllers
             return Ok(await projectService.GetOne(Id));
         }
 
+        [HttpGet("{Id}")]
+        public async Task<IActionResult> GetOne([FromRoute] Guid Id,
+            [FromServices] ProjectService projectService)
+        {
+            return Ok(await projectService.GetOne(Id));
+        }
+
         [HttpPatch]
         public async Task<IActionResult> UpdateProject([FromBody] ProjectDetailDTO request,
             [FromServices] ProjectService projectService)

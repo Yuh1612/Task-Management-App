@@ -20,7 +20,7 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> GetInfo([FromRoute] string AccessToken, [FromServices] UserService userService)
         {
-            return Ok(await userService.GetInfo(AccessToken));
+            return Ok(await userService.GetUserInfo(AccessToken));
         }
 
         [HttpPost("regist")]

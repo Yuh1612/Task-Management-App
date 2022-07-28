@@ -58,7 +58,6 @@ builder.Services.AddScoped<ApplicationDbContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IListTaskRepository, ListTaskRepository>();
-builder.Services.AddScoped<IProjectMemberRepository, ProjectMemberRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();

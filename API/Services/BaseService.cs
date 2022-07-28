@@ -19,26 +19,9 @@ namespace API.Services
             _mapper = mapper;
         }
 
-        public async Task<User> GetCurrentUser()
+        public Guid GetCurrentUserId()
         {
-            try
-            {
-                var userId = _contextAccessor.HttpContext?.User.Claims.First(i => i.Type == "UserId").Value;
-                var user = await _unitOfWork.userRepository.FindAsync(Guid.Parse(userId));
-                if (user == null) throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-                return user;
-            }
-            catch
-            {
-                throw new HttpResponseException(System.Net.HttpStatusCode.Unauthorized);
-            }
-        }
-
-        public async Task<bool> ProjectAuthorize(Project project)
-        {
-            var user = await GetCurrentUser();
-            if (project.HasOwner(user) || project.HasMember(user)) return true;
-            return false;
+            return Guid.Parse(_contextAccessor.HttpContext?.User.Claims.First(i => i.Type == "UserId").Value);
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Domain.Interfaces.Repositories
     {
         public Task<User?> GetOneByUserName(string userName);
 
-        public Task<List<User>> GetAllByProject(Project project);
+        public Task<List<User>> GetAllByProject(Guid projectId);
 
-        public Task<List<User>> GetAllByTask(Entities.Tasks.Task task);
+        public Task<List<User>> GetAllByTask(Guid taskId);
 
         public Task<bool> IsExistUserName(string userName);
     }

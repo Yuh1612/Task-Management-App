@@ -1,4 +1,5 @@
-﻿using API.DTOs.Users;
+﻿using API.DTOs.Projects;
+using API.DTOs.Users;
 using API.Extensions;
 using AutoMapper;
 using Domain.Entities.Users;
@@ -22,20 +23,26 @@ namespace API.Services
         {
             var user = await _unitOfWork.userRepository.FindAsync(Id);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
             var response = _mapper.Map<UserMinDTO>(user);
+
+            foreach (var i in user.ProjectMembers)
+            {
+                response.Projects.Add(_mapper.Map<ProjectDetailDTO>(i.Project));
+            }
+
             return response;
         }
 
-        public async Task<UserDTO> GetInfo(string AccessToken)
+        public async Task<UserDetailDTO> GetUserInfo(string AccessToken)
         {
             var userId = _jwtHandler.GetUserId(AccessToken);
 
             var user = await _unitOfWork.userRepository.FindAsync(userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-            var projects = await _unitOfWork.projectRepository.GetAllByUser(user);
-            var response = _mapper.Map<UserDTO>(user);
-            _mapper.Map(projects, response.Projects);
+            var response = _mapper.Map<UserDetailDTO>(user);
+
             return response;
         }
 

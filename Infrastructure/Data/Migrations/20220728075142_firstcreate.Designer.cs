@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220715022259_FirstCreate")]
-    partial class FirstCreate
+    [Migration("20220728075142_firstcreate")]
+    partial class firstcreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,12 +34,6 @@ namespace Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
@@ -49,12 +43,6 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedById")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -70,12 +58,6 @@ namespace Infrastructure.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -86,12 +68,6 @@ namespace Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -105,6 +81,9 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsCreated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("ProjectId")
@@ -132,6 +111,9 @@ namespace Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<string>("StorageUrl")
                         .IsRequired()
@@ -163,6 +145,9 @@ namespace Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -171,18 +156,91 @@ namespace Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Labels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("f923ce44-176b-45f5-972f-25b216a7b93f"),
+                            Color = "Purple",
+                            IsDelete = false,
+                            Title = ".NET"
+                        },
+                        new
+                        {
+                            Id = new Guid("3c08448c-fc93-4c5a-8c34-e48ddd7cf12d"),
+                            Color = "Blue",
+                            IsDelete = false,
+                            Title = "Java"
+                        },
+                        new
+                        {
+                            Id = new Guid("d09bdfa2-6e43-4b06-bb16-88fa5ea50d27"),
+                            Color = "Green",
+                            IsDelete = false,
+                            Title = "NestJs"
+                        },
+                        new
+                        {
+                            Id = new Guid("066834ef-807b-4414-b9b5-253bf1abd38d"),
+                            Color = "Black",
+                            IsDelete = false,
+                            Title = "ReactJs"
+                        },
+                        new
+                        {
+                            Id = new Guid("d165ee37-a62b-4a9a-a418-bad940652cd7"),
+                            Color = "Red",
+                            IsDelete = false,
+                            Title = "Angular"
+                        },
+                        new
+                        {
+                            Id = new Guid("c61e3da3-6b1a-4ec2-a229-b735864511ad"),
+                            Color = "Orange",
+                            IsDelete = false,
+                            Title = "Python"
+                        },
+                        new
+                        {
+                            Id = new Guid("0598fc66-4ec4-45f5-a2cf-52ff729acd20"),
+                            Color = "White",
+                            IsDelete = false,
+                            Title = "VueJs"
+                        },
+                        new
+                        {
+                            Id = new Guid("4405f6b0-3019-4095-8441-aafcc8d36608"),
+                            Color = "Black",
+                            IsDelete = false,
+                            Title = "Flutter"
+                        },
+                        new
+                        {
+                            Id = new Guid("b025ff2d-4d33-4a84-a49f-c228eb795f55"),
+                            Color = "Gray",
+                            IsDelete = false,
+                            Title = "Dart"
+                        },
+                        new
+                        {
+                            Id = new Guid("ed10a4a5-0f83-482f-b3ed-4b0156017606"),
+                            Color = "Brown",
+                            IsDelete = false,
+                            Title = "Golang"
+                        },
+                        new
+                        {
+                            Id = new Guid("2b225e43-f924-4514-b125-b001f68d4822"),
+                            Color = "Pink",
+                            IsDelete = false,
+                            Title = "PHP"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Tasks.Task", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
@@ -199,12 +257,6 @@ namespace Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ListTaskId");
@@ -219,6 +271,9 @@ namespace Infrastructure.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDelete")
                         .HasColumnType("bit");
 
                     b.Property<Guid?>("TaskId")
@@ -244,6 +299,9 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDone")
                         .HasColumnType("bit");
@@ -283,12 +341,6 @@ namespace Infrastructure.Data.Migrations
                     b.Property<DateTime?>("BirthDay")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Email")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -312,12 +364,6 @@ namespace Infrastructure.Data.Migrations
 
                     b.Property<DateTime?>("RefreshTokenExpiredDay")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UpdatedById")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -360,8 +406,8 @@ namespace Infrastructure.Data.Migrations
                     b.Property<string>("RefId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
