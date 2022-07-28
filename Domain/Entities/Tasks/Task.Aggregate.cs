@@ -39,9 +39,9 @@ namespace Domain.Entities.Tasks
             todo.IsDelete = true;
         }
 
-        public bool HasMember(User user)
+        public bool HasMember(Guid userId)
         {
-            return TaskMembers.Any(x => x.UserId == user.Id);
+            return TaskMembers.Any(x => x.UserId == userId);
         }
 
         public void AddAttachment(Attachment attachment)
@@ -67,12 +67,12 @@ namespace Domain.Entities.Tasks
             taskMember.IsDelete = true;
         }
 
-        public void ActiveMember(User user)
+        public void ActiveMember(Guid userId)
         {
             foreach (var taskmember in TaskMembers)
             {
                 taskmember.IsActive = false;
-                if (taskmember.UserId == user.Id) taskmember.IsActive = true;
+                if (taskmember.UserId == userId) taskmember.IsActive = true;
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿using Domain.Base;
-using Domain.Entities.Users;
+using Domain.Entities.Projects.Events;
 
 namespace Domain.Entities.Projects
 {
@@ -53,6 +53,7 @@ namespace Domain.Entities.Projects
         public void RemoveListTask(ListTask listTask)
         {
             listTask.IsDelete = true;
+            AddEvent(new DeleteListTaskDomainEvent(listTask));
         }
 
         public void UpdateListTask(ListTask listTask)
@@ -72,6 +73,8 @@ namespace Domain.Entities.Projects
             {
                 projectmember.IsDelete = true;
             }
+
+            AddEvent(new DeleteProjectDomainEvent(this));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Infrastructure.Data.Repositories
 
         public async Task<List<Project>> GetAllByUser(Guid userId)
         {
-            return dbSet.Where(x => x.ProjectMembers.Any(x => x.UserId == userId)).ToList();
+            return await dbSet.Where(x => x.ProjectMembers.Any(x => x.UserId == userId)).ToListAsync();
         }
 
         public  Project? GetProject(Guid projectId, Guid userId)

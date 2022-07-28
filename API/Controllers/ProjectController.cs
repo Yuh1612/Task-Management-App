@@ -11,10 +11,9 @@ namespace API.Controllers
     public class ProjectController : ApplicationController
     {
         [HttpGet("{Id}")]
-        public async Task<IActionResult> GetOne([FromRoute] Guid Id,
-            [FromServices] ProjectService projectService)
+        public async Task<IActionResult> GetAll([FromServices] ProjectService projectService)
         {
-            return Ok(await projectService.GetOne(Id));
+            return Ok(await projectService.GetAll());
         }
 
         [HttpGet("{Id}")]

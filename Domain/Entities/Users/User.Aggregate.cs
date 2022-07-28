@@ -17,7 +17,10 @@ namespace Domain.Entities.Users
             Age = age;
             BirthDay = birthDay;
             ProjectMembers = new HashSet<ProjectMember>();
+        }
 
+        public void AddCreateUserDomainEvent()
+        {
             var newEvent = new CreateUserDomainEvent(this);
             AddEvent(newEvent);
         }
