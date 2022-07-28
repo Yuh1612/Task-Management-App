@@ -19,6 +19,44 @@ namespace API.Services
             _jwtHandler = jwtHandler;
         }
 
+        public async Task<UserDetailDTO> CreateUser(CreateUserDTO request)
+        {
+            if (await _unitOfWork.userRepository.IsExistUserName(request.UserName))
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            try
+            {
+                var user = _mapper.Map<User>(request);
+                user.HashPassWord();
+                await _unitOfWork.BeginTransaction();
+                await _unitOfWork.userRepository.InsertAsync(user);
+                user.AddCreateUserDomainEvent();
+                await _unitOfWork.CommitTransaction(false);
+                return _mapper.Map<UserDetailDTO>(user);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+        }
+
+        public async Task UpdateUser(UpdateUserDTO request)
+        {
+            var user = await _unitOfWork.userRepository.FindAsync(GetCurrentUserId());
+            try
+            {
+                await _unitOfWork.BeginTransaction();
+                user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
+                _unitOfWork.userRepository.Update(user);
+                await _unitOfWork.CommitTransaction();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+        }
+
         public async Task<UserMinDTO> GetOne(Guid Id)
         {
             var user = await _unitOfWork.userRepository.FindAsync(Id);
@@ -44,27 +82,6 @@ namespace API.Services
             var response = _mapper.Map<UserDetailDTO>(user);
 
             return response;
-        }
-
-        public async Task<UserDetailDTO> CreateUser(CreateUserDTO request)
-        {
-            if (await _unitOfWork.userRepository.IsExistUserName(request.UserName))
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            try
-            {
-                var user = _mapper.Map<User>(request);
-                user.HashPassWord();
-                await _unitOfWork.BeginTransaction();
-                await _unitOfWork.userRepository.InsertAsync(user);
-                user.AddCreateUserDomainEvent();
-                await _unitOfWork.CommitTransaction(false);
-                return _mapper.Map<UserDetailDTO>(user);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
         }
 
         public async Task<UserTokenDTO> ValidateUser(UserAccountDTO request)
@@ -111,23 +128,6 @@ namespace API.Services
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
             return token;
-        }
-
-        public async Task UpdateUser(UpdateUserDTO request)
-        {
-            var user = await _unitOfWork.userRepository.FindAsync(GetCurrentUserId());
-            try
-            {
-                await _unitOfWork.BeginTransaction();
-                user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
-                _unitOfWork.userRepository.Update(user);
-                await _unitOfWork.CommitTransaction();
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-            }
         }
     }
 }
