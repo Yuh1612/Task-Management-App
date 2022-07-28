@@ -31,7 +31,7 @@ namespace Infrastructure.Data.Repositories
             {
                 return task.ListTask.Project.ProjectMembers.Any(c => c.UserId == userId) ? task : null;
             }
-            return null;
+            return task;
         }
     }
 }
