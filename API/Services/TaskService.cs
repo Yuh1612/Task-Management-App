@@ -16,7 +16,7 @@ namespace API.Services
 
         public async Task<TaskDTO> GetOne(Guid Id)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(Id);
+            var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, task);
 
             var todos = await _unitOfWork.todoRepository.GetAllByTask(task.Id);
@@ -37,6 +37,9 @@ namespace API.Services
             var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.listTaskId);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -54,7 +57,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task UpdateTask(TaskDetailDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.Id);
+            var task = await _unitOfWork.taskRepository.GetTask(request.Id, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             try
@@ -73,7 +76,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task DeleteTask(Guid Id)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(Id);
+            var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             try
@@ -95,6 +98,8 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
             var todo = await _unitOfWork.todoRepository.FindAsync(Id);
             if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -114,7 +119,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task AddTodo(CreateTodoDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             try
@@ -133,7 +138,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task AddAttachment(CreateAttachmentDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             string? url = await UploadFiles.Upload(request.file);
@@ -159,6 +164,9 @@ namespace API.Services
             var task = await _unitOfWork.taskRepository.GetOneByAttachment(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
+            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+
+
             var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
             if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -178,7 +186,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task AddMember(AssigmentDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
@@ -202,7 +210,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task RemoveMember(AssigmentDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
@@ -226,7 +234,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task AddLabel(TaskLabelDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
@@ -250,7 +258,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task RemoveLabel(TaskLabelDTO request)
         {
-            var task = await _unitOfWork.taskRepository.FindAsync(request.taskId);
+            var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
