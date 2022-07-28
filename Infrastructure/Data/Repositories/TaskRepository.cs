@@ -29,7 +29,7 @@ namespace Infrastructure.Data.Repositories
             var task = await dbSet.FirstOrDefaultAsync(c => c.Id == taskId);
             if (task != null)
             {
-                return task.ListTask.Project.ProjectMembers.Where(c => c.UserId == userId).Count() > 0 ? task : null;
+                return task.ListTask.Project.ProjectMembers.Any(c => c.UserId == userId) ? task : null;
             }
             return null;
         }
