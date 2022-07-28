@@ -56,5 +56,78 @@ namespace API.Services
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
         }
+
+        public async Task<UserMinDTO> GetOne(Guid Id)
+        {
+            var user = await _unitOfWork.userRepository.FindAsync(Id);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var response = _mapper.Map<UserMinDTO>(user);
+
+            foreach (var i in user.ProjectMembers)
+            {
+                response.Projects.Add(_mapper.Map<ProjectDetailDTO>(i.Project));
+            }
+
+            return response;
+        }
+
+        public async Task<UserDetailDTO> GetUserInfo(string AccessToken)
+        {
+            var userId = _jwtHandler.GetUserId(AccessToken);
+
+            var user = await _unitOfWork.userRepository.FindAsync(userId);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var response = _mapper.Map<UserDetailDTO>(user);
+
+            return response;
+        }
+
+        public async Task<UserTokenDTO> ValidateUser(UserAccountDTO request)
+        {
+            var user = await _unitOfWork.userRepository.GetOneByUserName(request.UserName);
+            if (user == null || !user.HasPassword(request.Password))
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
+            var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
+            try
+            {
+                await _unitOfWork.BeginTransaction();
+                user.UpdateRefreshToken(token.RefreshToken);
+                _unitOfWork.userRepository.Update(user);
+                await _unitOfWork.CommitTransaction(false);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+            return token;
+        }
+
+        public async Task<UserTokenDTO> RefreshToken(UserTokenDTO request)
+        {
+            var userId = _jwtHandler.ValidateAccessToken(request.AccessToken);
+
+            var user = await _unitOfWork.userRepository.FindAsync(userId);
+            if (user == null || !user.HasRefreshToken(request.RefreshToken) || user.IsRefreshTokenExpired())
+                throw new HttpResponseException(HttpStatusCode.Unauthorized);
+
+            var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
+            try
+            {
+                await _unitOfWork.BeginTransaction();
+                user.UpdateRefreshToken(token.RefreshToken);
+                _unitOfWork.userRepository.Update(user);
+                await _unitOfWork.CommitTransaction(false);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransaction();
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+            return token;
+        }
     }
 }
