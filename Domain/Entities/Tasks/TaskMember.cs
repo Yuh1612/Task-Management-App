@@ -9,10 +9,10 @@ namespace Domain.Entities.Tasks
         {
         }
 
-        public TaskMember(Task task, User user, bool isActive)
+        public TaskMember(Guid taskId, Guid userId, bool isActive)
         {
-            Task = task;
-            User = user;
+            TaskId = taskId;
+            UserId = userId;
             IsActive = isActive;
         }
 

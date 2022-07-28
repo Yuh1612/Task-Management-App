@@ -54,11 +54,10 @@ namespace Domain.Entities.Tasks
             attachment.IsDelete = true;
         }
 
-        public void AddMember(User user, bool isActive = false)
+        public void AddMember(Guid userId, bool isActive = false)
         {
-            var taskMember = new TaskMember(this, user, isActive);
+            var taskMember = new TaskMember(Id, userId, isActive);
             TaskMembers.Add(taskMember);
-            user.AddTask(taskMember);
         }
 
         public void RemoveMember(User user)
@@ -108,7 +107,7 @@ namespace Domain.Entities.Tasks
             }
             foreach (var label in Labels)
             {
-                RemoveLabel(label);
+                Labels.Remove(label);
             }
         }
     }

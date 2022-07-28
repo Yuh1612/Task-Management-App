@@ -34,11 +34,6 @@ namespace Domain.Entities.Users
             BirthDay = birthDay ?? BirthDay;
         }
 
-        public bool HasUserName(string username)
-        {
-            return UserName.Equals(username);
-        }
-
         public bool HasPassword(string password)
         {
             return BCrypt.Net.BCrypt.Verify(password, Password);
@@ -63,26 +58,6 @@ namespace Domain.Entities.Users
         public bool IsRefreshTokenExpired()
         {
             return RefreshTokenExpiredDay <= DateTime.UtcNow;
-        }
-
-        public bool HasProject(Project project)
-        {
-            return ProjectMembers.Any(m => m.ProjectId == project.Id);
-        }
-
-        public bool HasTask(Tasks.Task task)
-        {
-            return TaskMembers.Any(m => m.TaskId == task.Id);
-        }
-
-        internal void AddProject(ProjectMember projectMember)
-        {
-            ProjectMembers.Add(projectMember);
-        }
-
-        internal void AddTask(TaskMember taskMember)
-        {
-            TaskMembers.Add(taskMember);
         }
     }
 }

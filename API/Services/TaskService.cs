@@ -192,7 +192,7 @@ namespace API.Services
             try
             {
                 await _unitOfWork.BeginTransaction();
-                task.AddMember(user);
+                task.AddMember(user.Id);
                 _unitOfWork.taskRepository.Update(task);
                 await _unitOfWork.CommitTransaction();
             }
