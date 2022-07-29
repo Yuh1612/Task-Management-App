@@ -139,10 +139,8 @@ namespace API.Services
 
         public async Task<ListTaskDTO> GetOneListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(listTaskId);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
-
-            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
             return _mapper.Map<ListTaskDTO>(listTask);
         }
@@ -168,17 +166,15 @@ namespace API.Services
 
         public async Task RemoveListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(listTaskId);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
 
-            if (project == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "Project is not found!");
-
             try
             {
                 await _unitOfWork.BeginTransaction();
-                project.RemoveListTask(listTask);
+                project?.RemoveListTask(listTask);
                 _unitOfWork.projectRepository.Update(project);
                 await _unitOfWork.CommitTransaction();
             }
@@ -191,10 +187,8 @@ namespace API.Services
 
         public async Task UpdateListTask(ListTaskDetailDTO request)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.Id);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(request.Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
-
-            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
             try
             {
