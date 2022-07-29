@@ -17,7 +17,7 @@ namespace API.Services
         public async Task<TaskDTO> GetOne(Guid Id)
         {
             var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, task);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var response = _mapper.Map<TaskDTO>(task);
             _mapper.Map(task.Todos.Where(s => s.ParentId == Guid.Empty).Select(s => s), response.Todos);
@@ -32,9 +32,9 @@ namespace API.Services
         public async Task<TaskDetailDTO> AddTask(CreateTaskDTO request)
         {
             var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.listTaskId);
-            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
-            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
             try
             {
@@ -47,14 +47,14 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task UpdateTask(TaskDetailDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.Id, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             try
             {
@@ -66,14 +66,14 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task DeleteTask(Guid Id)
         {
             var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             try
             {
@@ -85,19 +85,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task RemoveTodo(Guid Id)
         {
             var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
-            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
             var todo = await _unitOfWork.todoRepository.FindAsync(Id);
-            if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Todo is not found!");
 
             try
             {
@@ -109,14 +109,14 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task AddTodo(CreateTodoDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             try
             {
@@ -128,17 +128,17 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task AddAttachment(CreateAttachmentDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found");
 
             string? url = await UploadFiles.Upload(request.file);
-            if (url == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (url == null) throw new HttpResponseException(HttpStatusCode.BadRequest, "Url is invalid!");
 
             try
             {
@@ -151,19 +151,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task RemoveAttachment(Guid Id)
         {
             var task = await _unitOfWork.taskRepository.GetOneByAttachment(Id);
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
-            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
+            if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
             var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
-            if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Attachment is not found!");
 
             try
             {
@@ -175,19 +175,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task AddMember(AssigmentDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
-            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
 
-            if (task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest, "User is already existed in this task!");
 
             try
             {
@@ -199,19 +199,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task RemoveMember(AssigmentDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var user = await _unitOfWork.userRepository.FindAsync(request.userId);
-            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
 
-            if (!task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (!task.HasMember(user.Id)) throw new HttpResponseException(HttpStatusCode.BadRequest, "User is not a member in this task!");
 
             try
             {
@@ -223,19 +223,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task AddLabel(TaskLabelDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
-            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Label is not found");
 
-            if (task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest, "Label is already existed in this task!");
 
             try
             {
@@ -247,19 +247,19 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
 
         public async System.Threading.Tasks.Task RemoveLabel(TaskLabelDTO request)
         {
             var task = await _unitOfWork.taskRepository.GetTask(request.taskId, GetCurrentUserId());
-            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var label = await _unitOfWork.labelRepository.FindAsync(request.labelId);
-            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (label == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Label is not found!");
 
-            if (!task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (!task.HasLabel(label)) throw new HttpResponseException(HttpStatusCode.BadRequest, "Label is not existed!");
 
             try
             {
@@ -271,7 +271,7 @@ namespace API.Services
             catch
             {
                 await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
         }
     }
