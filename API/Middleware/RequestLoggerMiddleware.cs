@@ -22,13 +22,31 @@
             }
             finally
             {
-                _logger.LogInformation(
-                    "Request {method} {url} => {statusCode}",
+                if (context.Response?.StatusCode >= 500)
+                {
+                    _logger.LogError("Request {method} {url} => {statusCode}",
                     context.Request?.Method,
                     context.Request?.Path.Value,
                     context.Response?.StatusCode);
-                _logger.LogInformation("About page visited at {DT}",
-                    DateTime.UtcNow.ToLongTimeString());
+                }
+                else
+                {
+                    if(context.Response?.StatusCode >= 400 && context.Response?.StatusCode < 500)
+                    {
+                        _logger.LogWarning("Request {method} {url} => {statusCode}",
+                            context.Request?.Method,
+                            context.Request?.Path.Value,
+                            context.Response?.StatusCode); 
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Request {method} {url} => {statusCode}",
+                            context.Request?.Method,
+                            context.Request?.Path.Value,
+                            context.Response?.StatusCode);
+                    }
+                }
+                Console.WriteLine(DateTime.Now.ToLongTimeString());
             }
         }
     }
