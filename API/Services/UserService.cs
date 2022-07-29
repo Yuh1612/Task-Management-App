@@ -25,7 +25,6 @@ namespace API.Services
             try
             {
                 var user = _mapper.Map<User>(request);
-                user.HashPassWord();
                 await _unitOfWork.BeginTransaction();
                 await _unitOfWork.userRepository.InsertAsync(user);
                 user.AddCreateUserDomainEvent();
@@ -42,10 +41,11 @@ namespace API.Services
         public async Task UpdateUser(UpdateUserDTO request)
         {
             var user = await _unitOfWork.userRepository.FindAsync(GetCurrentUserId());
+            if (user == null) throw new HttpResponseException(HttpStatusCode.Unauthorized);
             try
             {
                 await _unitOfWork.BeginTransaction();
-                user.Update(request.Password, request.Name, request.Email, request.Age, request.BirthDay);
+                user.Update(request.Email);
                 _unitOfWork.userRepository.Update(user);
                 await _unitOfWork.CommitTransaction();
             }
@@ -82,7 +82,7 @@ namespace API.Services
         public async Task<UserTokenDTO> ValidateUser(UserAccountDTO request)
         {
             var user = await _unitOfWork.userRepository.GetOneByUserName(request.UserName);
-            if (user == null || !user.HasPassword(request.Password))
+            if (user == null)
                 throw new HttpResponseException(HttpStatusCode.Unauthorized);
 
             var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
