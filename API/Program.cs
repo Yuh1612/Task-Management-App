@@ -1,6 +1,7 @@
 using API;
 using API.Authentications;
 using API.Extensions;
+using API.Middleware;
 using API.Services;
 using Domain.Entities.Projects.Events;
 using Domain.Entities.Users.Events;
@@ -89,5 +90,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<RequestLoggerMiddleware>();
 
 app.Run();
