@@ -71,7 +71,7 @@ namespace API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("id")]
+        [HttpPost("listtasks")]
         public async Task<IActionResult> CreateListTask([FromBody] CreateListTaskDTO request,
             [FromServices] ProjectService projectService)
         {
