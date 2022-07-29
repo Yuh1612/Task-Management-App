@@ -14,9 +14,9 @@ namespace API.Services
         {
         }
 
-        public async Task<TaskDTO> GetOne(Guid Id)
+        public async Task<TaskDTO> GetOne(Guid taskId)
         {
-            var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
+            var task = await _unitOfWork.taskRepository.GetTask(taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             var response = _mapper.Map<TaskDTO>(task);
@@ -70,9 +70,9 @@ namespace API.Services
             }
         }
 
-        public async System.Threading.Tasks.Task DeleteTask(Guid Id)
+        public async System.Threading.Tasks.Task DeleteTask(Guid taskId)
         {
-            var task = await _unitOfWork.taskRepository.GetTask(Id, GetCurrentUserId());
+            var task = await _unitOfWork.taskRepository.GetTask(taskId, GetCurrentUserId());
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             try
@@ -89,14 +89,14 @@ namespace API.Services
             }
         }
 
-        public async System.Threading.Tasks.Task RemoveTodo(Guid Id)
+        public async System.Threading.Tasks.Task RemoveTodo(Guid todoId)
         {
             var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
-            var todo = await _unitOfWork.todoRepository.FindAsync(Id);
+            var todo = await _unitOfWork.todoRepository.FindAsync(todoId);
             if (todo == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Todo is not found!");
 
             try
@@ -155,14 +155,14 @@ namespace API.Services
             }
         }
 
-        public async System.Threading.Tasks.Task RemoveAttachment(Guid Id)
+        public async System.Threading.Tasks.Task RemoveAttachment(Guid attachmentId)
         {
-            var task = await _unitOfWork.taskRepository.GetOneByAttachment(Id);
+            var task = await _unitOfWork.taskRepository.GetOneByAttachment(attachmentId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
 
-            var attachment = await _unitOfWork.attachmentRepository.FindAsync(Id);
+            var attachment = await _unitOfWork.attachmentRepository.FindAsync(attachmentId);
             if (attachment == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Attachment is not found!");
 
             try

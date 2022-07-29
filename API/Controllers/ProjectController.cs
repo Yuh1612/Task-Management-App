@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]s")]
+    [Route("api/projects")]
     [Authorize]
     public class ProjectController : ApplicationController
     {
@@ -16,11 +16,11 @@ namespace API.Controllers
             return Ok(await projectService.GetAll());
         }
 
-        [HttpGet("{Id}")]
-        public async Task<IActionResult> GetOne([FromRoute] Guid Id,
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOne([FromRoute] Guid id,
             [FromServices] ProjectService projectService)
         {
-            return Ok(await projectService.GetOne(Id));
+            return Ok(await projectService.GetOne(id));
         }
 
         [HttpPatch]
@@ -31,11 +31,11 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> DeleteProject([FromRoute] Guid Id,
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProject([FromRoute] Guid id,
             [FromServices] ProjectService projectService)
         {
-            await projectService.DeleteProject(Id);
+            await projectService.DeleteProject(id);
             return NoContent();
         }
 
@@ -47,7 +47,7 @@ namespace API.Controllers
             return CreatedAtAction(nameof(GetOne), new { Id = project.Id }, project);
         }
 
-        [HttpPost("Members")]
+        [HttpPost("members")]
         public async Task<IActionResult> AddMember([FromBody] ProjectMemberDTO request,
             [FromServices] ProjectService projectService)
         {
@@ -55,7 +55,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("Members")]
+        [HttpDelete("members")]
         public async Task<IActionResult> RemoveMember([FromBody] ProjectMemberDTO request,
             [FromServices] ProjectService projectService)
         {
@@ -63,15 +63,15 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpGet("ListTasks/{Id}")]
-        public async Task<IActionResult> GetOneListTask([FromRoute] Guid Id,
+        [HttpGet("listtasks/{id}")]
+        public async Task<IActionResult> GetOneListTask([FromRoute] Guid id,
             [FromServices] ProjectService projectService)
         {
-            var response = await projectService.GetOneListTask(Id);
+            var response = await projectService.GetOneListTask(id);
             return Ok(response);
         }
 
-        [HttpPost("ListTasks")]
+        [HttpPost("listtasks")]
         public async Task<IActionResult> CreateListTask([FromBody] CreateListTaskDTO request,
             [FromServices] ProjectService projectService)
         {
@@ -79,15 +79,15 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("ListTasks/{Id}")]
-        public async Task<IActionResult> RemoveListTask([FromRoute] Guid Id,
+        [HttpDelete("listtasks/{id}")]
+        public async Task<IActionResult> RemoveListTask([FromRoute] Guid id,
             [FromServices] ProjectService projectService)
         {
-            await projectService.RemoveListTask(Id);
+            await projectService.RemoveListTask(id);
             return NoContent();
         }
 
-        [HttpPatch("ListTasks")]
+        [HttpPatch("listtasks")]
         public async Task<IActionResult> UpdateListTask([FromBody] ListTaskDetailDTO request,
             [FromServices] ProjectService projectService)
         {

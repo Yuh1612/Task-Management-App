@@ -53,9 +53,9 @@ namespace API.Services
             }
         }
 
-        public async Task DeleteProject(Guid id)
+        public async Task DeleteProject(Guid projectId)
         {
-            var project = await _unitOfWork.projectRepository.GetProject(id, GetCurrentUserId());
+            var project = await _unitOfWork.projectRepository.GetProject(projectId, GetCurrentUserId());
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Project is not found!");
 
             try
@@ -137,9 +137,9 @@ namespace API.Services
             }
         }
 
-        public async Task<ListTaskDTO> GetOneListTask(Guid Id)
+        public async Task<ListTaskDTO> GetOneListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(listTaskId);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");
@@ -166,9 +166,9 @@ namespace API.Services
             }
         }
 
-        public async Task RemoveListTask(Guid Id)
+        public async Task RemoveListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            var listTask = await _unitOfWork.listTaskRepository.FindAsync(listTaskId);
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
