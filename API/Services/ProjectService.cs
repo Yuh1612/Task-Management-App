@@ -137,10 +137,8 @@ namespace API.Services
 
         public async Task<ListTaskDTO> GetOneListTask(Guid Id)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             return _mapper.Map<ListTaskDTO>(listTask);
         }
@@ -166,17 +164,15 @@ namespace API.Services
 
         public async Task RemoveListTask(Guid Id)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(Id);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
 
-            if (project == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
-
             try
             {
                 await _unitOfWork.BeginTransaction();
-                project.RemoveListTask(listTask);
+                project?.RemoveListTask(listTask);
                 _unitOfWork.projectRepository.Update(project);
                 await _unitOfWork.CommitTransaction();
             }
@@ -189,10 +185,8 @@ namespace API.Services
 
         public async Task UpdateListTask(ListTaskDetailDTO request)
         {
-            var listTask = await _unitOfWork.listTaskRepository.FindAsync(request.Id);
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(request.Id, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            if (await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden);
 
             try
             {
