@@ -6,18 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]s")]
+    [Route("api")]
     [Authorize]
     public class TaskController : ApplicationController
     {
-        [HttpGet("{id}")]
+        [HttpGet("task/{id}")]
         public async Task<IActionResult> GetOne([FromRoute] Guid id,
             [FromServices] TaskService taskService)
         {
             return Ok(await taskService.GetOne(id));
         }
 
-        [HttpPost]
+        [HttpPost("task")]
         public async Task<IActionResult> AddTask([FromBody] CreateTaskDTO request,
             [FromServices] TaskService taskService)
         {
@@ -25,7 +25,7 @@ namespace API.Controllers
             return CreatedAtAction(nameof(GetOne), new { Id = task.Id }, task);
         }
 
-        [HttpPatch]
+        [HttpPatch("task")]
         public async Task<IActionResult> UpdateTask([FromBody] TaskDetailDTO request,
             [FromServices] TaskService taskService)
         {
@@ -33,7 +33,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("task/{id}")]
         public async Task<IActionResult> DeleteTask([FromRoute] Guid id,
             [FromServices] TaskService taskService)
         {
@@ -41,7 +41,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPost("todos")]
+        [HttpPost("task/todos")]
         public async Task<IActionResult> AddTodo([FromBody] CreateTodoDTO request,
             [FromServices] TaskService taskService)
         {
@@ -49,7 +49,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("todos/{id}")]
+        [HttpDelete("task/todos/{id}")]
         public async Task<IActionResult> RemoveTodo([FromRoute] Guid id,
             [FromServices] TaskService taskService)
         {
@@ -57,7 +57,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPost("attachments")]
+        [HttpPost("task/attachments")]
         public async Task<IActionResult> AddAttachment([FromForm] CreateAttachmentDTO request,
            [FromServices] TaskService taskService)
         {
@@ -65,7 +65,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("attachments/{id}")]
+        [HttpDelete("task/attachments/{id}")]
         public async Task<IActionResult> RemoveAttachment([FromRoute] Guid Id,
             [FromServices] TaskService taskService)
         {
@@ -73,7 +73,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPost("members")]
+        [HttpPost("task/members")]
         public async Task<IActionResult> AddMember([FromBody] AssigmentDTO request,
            [FromServices] TaskService taskService)
         {
@@ -81,7 +81,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("members")]
+        [HttpDelete("task/members")]
         public async Task<IActionResult> RemoveMember([FromBody] AssigmentDTO request,
             [FromServices] TaskService taskService)
         {
@@ -89,7 +89,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpPost("labels")]
+        [HttpPost("task/labels")]
         public async Task<IActionResult> AddLabel([FromBody] TaskLabelDTO request,
            [FromServices] TaskService taskService)
         {
@@ -97,7 +97,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("labels")]
+        [HttpDelete("task/labels")]
         public async Task<IActionResult> RemoveLabel([FromBody] TaskLabelDTO request,
             [FromServices] TaskService taskService)
         {
