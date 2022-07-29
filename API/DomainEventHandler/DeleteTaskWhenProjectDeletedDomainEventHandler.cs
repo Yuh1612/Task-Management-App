@@ -18,9 +18,9 @@ namespace API.DomainEventHandler
             try
             {
                 await _unitOfWork.BeginTransaction();
-                foreach (var ListTask in notification.project.ListTasks)
+                foreach (var listtask in notification.project.ListTasks)
                 {
-                    foreach (var task in ListTask.Tasks)
+                    foreach (var task in listtask.Tasks)
                     {
                         task.Delete();
                     }
@@ -30,6 +30,7 @@ namespace API.DomainEventHandler
             catch
             {
                 await _unitOfWork.RollbackTransaction();
+                throw;
             }
         }
     }

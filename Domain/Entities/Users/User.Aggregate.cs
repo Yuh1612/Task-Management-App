@@ -7,11 +7,15 @@ namespace Domain.Entities.Users
 {
     public partial class User : IAggregateRoot
     {
-        public User(string userName, string? email)
+        public User(string userName, string password, string name, string? email, int? age, DateTime? birthDay)
         {
             if (Id == Guid.Empty) Id = Guid.NewGuid();
             UserName = userName;
+            Password = password;
+            Name = name;
             Email = email;
+            Age = age;
+            BirthDay = birthDay;
             ProjectMembers = new HashSet<ProjectMember>();
         }
 
@@ -21,9 +25,23 @@ namespace Domain.Entities.Users
             AddEvent(newEvent);
         }
 
-        public void Update(string? email)
+        public void Update(string? password, string? name, string? email, int? age, DateTime? birthDay)
         {
+            Password = password == null ? Password : BCrypt.Net.BCrypt.HashPassword(password);
+            Name = name ?? Name;
             Email = email ?? Email;
+            Age = age ?? Age;
+            BirthDay = birthDay ?? BirthDay;
+        }
+
+        public bool HasPassword(string password)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, Password);
+        }
+
+        public void HashPassWord()
+        {
+            Password = BCrypt.Net.BCrypt.HashPassword(Password);
         }
 
         public void UpdateRefreshToken(string refreshToken)

@@ -31,7 +31,7 @@ namespace API.Authentications
 
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyBytes),
-                    SecurityAlgorithms.HmacSha256Signature
+                    SecurityAlgorithms.HmacSha512Signature
                 )
             };
 
@@ -126,7 +126,7 @@ namespace API.Authentications
                 if (validatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var result = jwtSecurityToken.Header.Alg.Equals(
-                        SecurityAlgorithms.HmacSha256,
+                        SecurityAlgorithms.HmacSha512,
                         StringComparison.InvariantCultureIgnoreCase
                     );
                     if (!result) throw new HttpResponseException(HttpStatusCode.Unauthorized);

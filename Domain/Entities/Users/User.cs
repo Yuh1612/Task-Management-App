@@ -17,15 +17,24 @@ namespace Domain.Entities.Users
         [StringLength(200)]
         public string UserName { get; set; }
 
+        [Required]
+        [StringLength(200)]
+        public string Password { get; set; }
+
+        [Required]
+        [StringLength(200)]
+        public string Name { get; set; }
+
         [StringLength(200)]
         public string? Email { get; set; }
+
+        public int? Age { get; set; }
+        public DateTime? BirthDay { get; set; }
 
         [StringLength(200)]
         public string? RefreshToken { get; set; }
 
         public DateTime? RefreshTokenExpiredDay { get; set; }
-
-        public Guid TenantId { get; set; }
 
         public virtual ICollection<ProjectMember> ProjectMembers { get; set; }
         public virtual ICollection<TaskMember> TaskMembers { get; set; }
