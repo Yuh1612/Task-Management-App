@@ -169,13 +169,11 @@ namespace API.Services
             var listTask = await _unitOfWork.listTaskRepository.GetListTask(listTaskId, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
-            var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
-
             try
             {
                 await _unitOfWork.BeginTransaction();
-                project?.RemoveListTask(listTask);
-                _unitOfWork.projectRepository.Update(project);
+                listTask.Project.RemoveListTask(listTask);
+                _unitOfWork.projectRepository.Update(listTask.Project);
                 await _unitOfWork.CommitTransaction();
             }
             catch
