@@ -42,6 +42,8 @@ namespace API.Services
         public async Task UpdateUser(UpdateUserDTO request)
         {
             var user = await _unitOfWork.userRepository.FindAsync(GetCurrentUserId());
+            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
+
             try
             {
                 await _unitOfWork.BeginTransaction();
@@ -54,75 +56,6 @@ namespace API.Services
                 await _unitOfWork.RollbackTransaction();
                 throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
             }
-        }
-
-        public async Task<UserMinDTO> GetOne(Guid userId)
-        {
-            var user = await _unitOfWork.userRepository.FindAsync(userId);
-            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
-
-            var response = _mapper.Map<UserMinDTO>(user);
-            _mapper.Map(user.ProjectMembers.Select(s => s.Project), response.Projects);
-
-            return response;
-        }
-
-        public async Task<UserDetailDTO> GetUserInfo(string accessToken)
-        {
-            var userId = _jwtHandler.GetUserId(accessToken);
-
-            var user = await _unitOfWork.userRepository.FindAsync(userId);
-            if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
-
-            var response = _mapper.Map<UserDetailDTO>(user);
-
-            return response;
-        }
-
-        public async Task<UserTokenDTO> ValidateUser(UserAccountDTO request)
-        {
-            var user = await _unitOfWork.userRepository.GetOneByUserName(request.UserName);
-            if (user == null || !user.HasPassword(request.Password))
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, "User is not found!");
-
-            var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
-            try
-            {
-                await _unitOfWork.BeginTransaction();
-                user.UpdateRefreshToken(token.RefreshToken);
-                _unitOfWork.userRepository.Update(user);
-                await _unitOfWork.CommitTransaction(false);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
-            }
-            return token;
-        }
-
-        public async Task<UserTokenDTO> RefreshToken(UserTokenDTO request)
-        {
-            var userId = _jwtHandler.ValidateAccessToken(request.AccessToken);
-
-            var user = await _unitOfWork.userRepository.FindAsync(userId);
-            if (user == null || !user.HasRefreshToken(request.RefreshToken) || user.IsRefreshTokenExpired())
-                throw new HttpResponseException(HttpStatusCode.Unauthorized, "Something went wrong!");
-
-            var token = new UserTokenDTO(_jwtHandler.GenerateAccessToken(user), _jwtHandler.GenerateRefreshToken());
-            try
-            {
-                await _unitOfWork.BeginTransaction();
-                user.UpdateRefreshToken(token.RefreshToken);
-                _unitOfWork.userRepository.Update(user);
-                await _unitOfWork.CommitTransaction(false);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransaction();
-                throw new HttpResponseException(HttpStatusCode.BadRequest, "Something went wrong!");
-            }
-            return token;
         }
     }
 }
