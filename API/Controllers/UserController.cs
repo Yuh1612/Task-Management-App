@@ -9,21 +9,21 @@ namespace API.Controllers
     [Route("api/[controller]s")]
     public class UserController : ApplicationController
     {
-        [HttpGet("Infomations/{Id}")]
+        [HttpGet("infomations/{id}")]
         [Authorize]
-        public async Task<IActionResult> GetOne([FromRoute] Guid Id, [FromServices] UserService userService)
+        public async Task<IActionResult> GetOne([FromRoute] Guid id, [FromServices] UserService userService)
         {
-            return Ok(await userService.GetOne(Id));
+            return Ok(await userService.GetOne(id));
         }
 
-        [HttpGet("{AccessToken}")]
+        [HttpGet("{accesstoken}")]
         [Authorize]
-        public async Task<IActionResult> GetInfo([FromRoute] string AccessToken, [FromServices] UserService userService)
+        public async Task<IActionResult> GetInfo([FromRoute] string accesstoken, [FromServices] UserService userService)
         {
-            return Ok(await userService.GetUserInfo(AccessToken));
+            return Ok(await userService.GetUserInfo(accesstoken));
         }
 
-        [HttpPost("regist")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] CreateUserDTO request, [FromServices] UserService userService)
         {
             var user = await userService.CreateUser(request);
@@ -36,7 +36,7 @@ namespace API.Controllers
             return Ok(await userService.ValidateUser(request));
         }
 
-        [HttpPost("refresh-token")]
+        [HttpPost("refreshtoken")]
         public async Task<IActionResult> RefreshToken([FromBody] UserTokenDTO request, [FromServices] UserService userService)
         {
             return Ok(await userService.RefreshToken(request));
