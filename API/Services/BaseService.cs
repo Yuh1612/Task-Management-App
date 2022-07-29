@@ -18,7 +18,7 @@ namespace API.Services
 
         public Guid GetCurrentUserId()
         {
-            return Guid.Parse(_contextAccessor.HttpContext?.User.Claims.First(i => i.Type == "UserId").Value);
+            return Guid.Parse(_contextAccessor.HttpContext?.User.Claims.First(i => i.Type == "id").Value);
         }
     }
 }
