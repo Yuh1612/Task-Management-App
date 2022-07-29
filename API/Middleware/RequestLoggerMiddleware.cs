@@ -27,6 +27,8 @@
                     context.Request?.Method,
                     context.Request?.Path.Value,
                     context.Response?.StatusCode);
+                _logger.LogInformation("About page visited at {DT}",
+                    DateTime.UtcNow.ToLongTimeString());
             }
         }
     }
