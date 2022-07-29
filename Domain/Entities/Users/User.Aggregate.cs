@@ -1,6 +1,5 @@
 ﻿using Domain.Base;
 using Domain.Entities.Projects;
-using Domain.Entities.Tasks;
 using Domain.Entities.Users.Events;
 
 namespace Domain.Entities.Users

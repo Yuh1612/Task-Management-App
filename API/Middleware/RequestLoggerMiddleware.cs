@@ -4,18 +4,20 @@
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
+
         public RequestLoggerMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
             _next = next;
             _logger = loggerFactory.CreateLogger<RequestLoggerMiddleware>();
         }
+
         public async Task Invoke(HttpContext context)
         {
             try
             {
                 await _next(context);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"The following error happened: {ex.Message}");
                 throw;
