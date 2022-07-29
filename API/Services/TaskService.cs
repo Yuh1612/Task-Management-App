@@ -91,7 +91,7 @@ namespace API.Services
 
         public async System.Threading.Tasks.Task RemoveTodo(Guid todoId)
         {
-            var task = await _unitOfWork.taskRepository.GetOneByTodo(Id);
+            var task = await _unitOfWork.taskRepository.GetOneByTodo(todoId);
             if (task == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Task is not found!");
 
             if (await _unitOfWork.taskRepository.GetTask(task.Id, GetCurrentUserId()) == null) throw new HttpResponseException(HttpStatusCode.Forbidden, "User is not a member in this project!");

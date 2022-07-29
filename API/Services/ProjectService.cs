@@ -139,7 +139,7 @@ namespace API.Services
 
         public async Task<ListTaskDTO> GetOneListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(listTaskId, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             return _mapper.Map<ListTaskDTO>(listTask);
@@ -166,7 +166,7 @@ namespace API.Services
 
         public async Task RemoveListTask(Guid listTaskId)
         {
-            var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
+            var listTask = await _unitOfWork.listTaskRepository.GetListTask(listTaskId, GetCurrentUserId());
             if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
