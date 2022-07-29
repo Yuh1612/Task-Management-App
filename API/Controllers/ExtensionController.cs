@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]s")]
+    [Route("api/extensions")]
     [Authorize]
     public class ExtensionController : ApplicationController
     {
@@ -18,13 +18,13 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("Histories")]
+        [HttpGet("histories")]
         public async Task<IActionResult> GetAllHistory([FromServices] IUnitOfWork unitOfWork)
         {
             return Ok(await unitOfWork.historyRepository.GetAllAsync());
         }
 
-        [HttpGet("Labels")]
+        [HttpGet("labels")]
         public async Task<IActionResult> GetAllLabel([FromServices] IUnitOfWork unitOfWork)
         {
             return Ok(_mapper.Map<List<LabelDTO>>(await unitOfWork.labelRepository.GetAllAsync()));

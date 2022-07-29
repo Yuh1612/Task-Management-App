@@ -56,9 +56,9 @@ namespace API.Services
             }
         }
 
-        public async Task<UserMinDTO> GetOne(Guid Id)
+        public async Task<UserMinDTO> GetOne(Guid userId)
         {
-            var user = await _unitOfWork.userRepository.FindAsync(Id);
+            var user = await _unitOfWork.userRepository.FindAsync(userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");
 
             var response = _mapper.Map<UserMinDTO>(user);
@@ -67,9 +67,9 @@ namespace API.Services
             return response;
         }
 
-        public async Task<UserDetailDTO> GetUserInfo(string AccessToken)
+        public async Task<UserDetailDTO> GetUserInfo(string accessToken)
         {
-            var userId = _jwtHandler.GetUserId(AccessToken);
+            var userId = _jwtHandler.GetUserId(accessToken);
 
             var user = await _unitOfWork.userRepository.FindAsync(userId);
             if (user == null) throw new HttpResponseException(HttpStatusCode.NotFound, "User is not found!");

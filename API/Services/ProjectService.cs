@@ -53,9 +53,9 @@ namespace API.Services
             }
         }
 
-        public async Task DeleteProject(Guid id)
+        public async Task DeleteProject(Guid projectId)
         {
-            var project = await _unitOfWork.projectRepository.GetProject(id, GetCurrentUserId());
+            var project = await _unitOfWork.projectRepository.GetProject(projectId, GetCurrentUserId());
             if (project == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Project is not found!");
 
             try
@@ -137,11 +137,11 @@ namespace API.Services
             }
         }
 
-        public async Task<ListTaskDTO> GetOneListTask(Guid Id)
+        public async Task<ListTaskDTO> GetOneListTask(Guid listTaskId)
         {
             var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
-            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
+
             return _mapper.Map<ListTaskDTO>(listTask);
         }
 
@@ -164,10 +164,10 @@ namespace API.Services
             }
         }
 
-        public async Task RemoveListTask(Guid Id)
+        public async Task RemoveListTask(Guid listTaskId)
         {
             var listTask = await _unitOfWork.listTaskRepository.GetListTask(Id, GetCurrentUserId());
-            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             var project = await _unitOfWork.projectRepository.GetProject(listTask.Project.Id, GetCurrentUserId());
 
@@ -188,7 +188,7 @@ namespace API.Services
         public async Task UpdateListTask(ListTaskDetailDTO request)
         {
             var listTask = await _unitOfWork.listTaskRepository.GetListTask(request.Id, GetCurrentUserId());
-            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+            if (listTask == null) throw new HttpResponseException(HttpStatusCode.NotFound, "Listtask is not found!");
 
             try
             {
