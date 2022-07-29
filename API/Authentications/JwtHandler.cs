@@ -23,15 +23,15 @@ namespace API.Authentications
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("UserId", user.Id.ToString()),
-                    new Claim("UserName", user.UserName),
+                    new Claim("username", user.UserName),
+                    new Claim("id", user.Id.ToString()),
                 }),
 
                 Expires = DateTime.UtcNow.AddHours(1),
 
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(secretKeyBytes),
-                    SecurityAlgorithms.HmacSha512Signature
+                    SecurityAlgorithms.HmacSha256Signature
                 )
             };
 
@@ -80,7 +80,7 @@ namespace API.Authentications
                 if (validatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var result = jwtSecurityToken.Header.Alg.Equals(
-                        SecurityAlgorithms.HmacSha512,
+                        SecurityAlgorithms.HmacSha256,
                         StringComparison.InvariantCultureIgnoreCase
                     );
                     if (!result) throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -126,7 +126,7 @@ namespace API.Authentications
                 if (validatedToken is JwtSecurityToken jwtSecurityToken)
                 {
                     var result = jwtSecurityToken.Header.Alg.Equals(
-                        SecurityAlgorithms.HmacSha512,
+                        SecurityAlgorithms.HmacSha256,
                         StringComparison.InvariantCultureIgnoreCase
                     );
                     if (!result) throw new HttpResponseException(HttpStatusCode.Unauthorized);
