@@ -33,30 +33,6 @@ var configuration = new ConfigurationBuilder()
 
 configuration.GetSection("AppSettings").Get<AppSettings>(options => options.BindNonPublicProperties = true);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
-{
-    o.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(AppSettings.SecretKey)),
-
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<HttpResponseExceptionFilter>();
-});
-
-builder.Services.AddControllers();
-builder.Services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var hcBuilder = builder.Services.AddHealthChecks();
 
 hcBuilder.AddRabbitMQ($"amqp://192.168.2.98", name: "rabbitmqbus-test", tags: new string[] { "rabbitmqbus" });
@@ -78,44 +54,9 @@ builder.Services.AddSingleton<IRabbitMQPersistentConnection>(sp =>
     return new DefaultRabbitMQPersistentConnection(factory, logger, retryCount);
 });
 
-builder.Services.AddSingleton<IEventBus, EventBusRabbitMQServices>(sp =>
-{
-    var subscriptionClientName = "queue_test";
-    var logger = sp.GetRequiredService<ILogger<EventBusRabbitMQServices>>();
-    var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
-    var rabbitMQPersistentConnection = sp.GetRequiredService<IRabbitMQPersistentConnection>();
-    var serviceScopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
-    var retryCount = 5;
+var startup = new Startup(builder.Configuration);
 
-    return new EventBusRabbitMQServices(rabbitMQPersistentConnection, logger, eventBusSubcriptionsManager, serviceScopeFactory, subscriptionClientName, retryCount);
-});
-
-builder.Services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-
-builder.Services.AddTransient<IIntegrationEventHandler<UserCreatedIntergrationEvent>, UserCreatedIntergrationEventHandler>();
-
-builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-builder.Services.AddMediatR(typeof(CreateUserDomainEvent).GetTypeInfo().Assembly);
-builder.Services.AddMediatR(typeof(DeleteListTaskDomainEvent).GetTypeInfo().Assembly);
-builder.Services.AddMediatR(typeof(DeleteProjectDomainEvent).GetTypeInfo().Assembly);
-
-builder.Services.AddScoped<ApplicationDbContext>();
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
-builder.Services.AddScoped<IListTaskRepository, ListTaskRepository>();
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
-builder.Services.AddScoped<ITodoRepository, TodoRepository>();
-builder.Services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-builder.Services.AddScoped<ILabelRepository, LabelRepository>();
-builder.Services.AddScoped<IHistoryRepository, HistoryRepository>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-builder.Services.AddScoped<IJwtHandler, JwtHandler>();
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddScoped<ProjectService>();
-builder.Services.AddScoped<TaskService>();
+startup.ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
